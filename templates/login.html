@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% block title %}Login - SI UNH{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        position: relative;
+        width: 100%;
+        max-width: 450px;
+        min-height: 500px;
+        background: #1c1c1c;
+        border-radius: 15px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Outer rotating lines (Purple and Green) */
+    .login-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(0deg, transparent, transparent, #A855F7, #A855F7, #A855F7);
+        transform-origin: bottom right;
+        animation: animate 6s linear infinite;
+        z-index: 1;
+    }
+
+    .login-container::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(0deg, transparent, transparent, #22C55E, #22C55E, #22C55E);
+        transform-origin: bottom right;
+        animation: animate 6s linear infinite;
+        animation-delay: -3s; /* 180 deg offset */
+        z-index: 1;
+    }
+
+    /* Inner rotating lines (Yellow and Blue) */
+    .border-line {
+        position: absolute;
+        top: 0;
+        inset: 0;
+    }
+
+    .border-line::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(0deg, transparent, transparent, #EAB308, #EAB308, #EAB308);
+        transform-origin: bottom right;
+        animation: animate 6s linear infinite;
+        animation-delay: -1.5s; /* 90 deg offset */
+        z-index: 1;
+    }
+
+    .border-line::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(0deg, transparent, transparent, #3B82F6, #3B82F6, #3B82F6);
+        transform-origin: bottom right;
+        animation: animate 6s linear infinite;
+        animation-delay: -4.5s; /* 270 deg offset */
+        z-index: 1;
+    }
+
+    @keyframes animate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .login-form-wrapper {
+        position: absolute;
+        inset: 4px; /* Border thickness */
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 12px;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-box {
+        position: relative;
+        width: 100%;
+        margin-top: 25px;
+    }
+
+    .input-box input {
+        position: relative;
+        width: 100%;
+        padding: 20px 10px 10px;
+        background: transparent;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        color: #23242a;
+        font-size: 1em;
+        letter-spacing: 0.05em;
+        transition: 0.5s;
+        z-index: 10;
+        border-bottom: 2px solid #A855F7;
+    }
+
+    .input-box span {
+        position: absolute;
+        left: 0;
+        padding: 20px 0px 10px;
+        font-size: 1em;
+        color: #8f8f8f;
+        pointer-events: none;
+        letter-spacing: 0.05em;
+        transition: 0.5s;
+    }
+
+    .input-box input:valid ~ span,
+    .input-box input:focus ~ span {
+        color: #A855F7;
+        transform: translateX(0px) translateY(-34px);
+        font-size: 0.75em;
+    }
+
+    .input-box i {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 2px;
+        background: #A855F7;
+        border-radius: 4px;
+        transition: 0.5s;
+        pointer-events: none;
+        z-index: 9;
+    }
+
+    .input-box input:valid ~ i,
+    .input-box input:focus ~ i {
+        height: 44px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="min-h-screen flex items-center justify-center bg-gray-900 py-16">
+    <div class="login-container">
+        <div class="border-line"></div>
+        <div class="login-form-wrapper">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-primary-800">Admin Login</h2>
+                <p class="text-gray-500 mt-2">Program Studi Sistem Informasi</p>
+                <div class="w-16 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mt-4"></div>
+            </div>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="mb-6 p-4 rounded-lg text-sm font-medium animate-pulse {% if message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} mr-2"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="input-box mb-6">
+                    <input type="text" name="username" required="required">
+                    <span>Username</span>
+                    <i></i>
+                </div>
+                <div class="input-box mb-10">
+                    <input type="password" name="password" required="required">
+                    <span>Password</span>
+                    <i></i>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-primary-600 to-primary-800 hover:from-primary-700 hover:to-primary-900 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300 flex items-center justify-center space-x-2">
+                    <span>Sign In</span>
+                    <i class="fas fa-sign-in-alt"></i>
+                </button>
+            </form>
+
+            <div class="mt-8 text-center">
+                <a href="{% url 'home' %}" class="text-sm text-gray-500 hover:text-primary-600 transition flex items-center justify-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Kembali ke Beranda
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

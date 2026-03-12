@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block title %}Survei Kepuasan Pengguna Lulusan - SI UNH{% endblock %}
+
+{% block content %}
+<section class="gradient-purple-gold text-white py-16">
+    <div class="container mx-auto px-4 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Survei Kepuasan Pengguna Lulusan</h1>
+        <p class="text-xl text-gold-200">Tracer Study Stakeholder / Pemberi Kerja Lulusan Sistem Informasi UNH</p>
+    </div>
+</section>
+
+<section class="py-12 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-5xl mx-auto">
+            <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+                <div class="bg-primary-800 text-white p-6">
+                    <h2 class="text-2xl font-bold mb-2">Formulir Evaluasi Pengguna</h2>
+                    <p class="text-primary-100">Bapak/Ibu yang terhormat, mohon kesediaan ketersediaan waktunya untuk
+                        memberikan penilaian terhadap kinerja lulusan kami yang bekerja di instansi Bapak/Ibu. Data ini
+                        sangat penting bagi kami dalam meningkatkan kualitas kurikulum dan akreditasi Program Studi.</p>
+                </div>
+
+                <form method="POST" class="p-8 space-y-8">
+                    {% csrf_token %}
+
+                    <!-- Identitas Responden -->
+                    <div>
+                        <h3 class="text-xl font-bold text-primary-800 border-b-2 border-gold-400 pb-2 mb-6">I. Identitas
+                            Responden & Instansi</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 font-semibold mb-2">Email Instansi/Responden: <span
+                                        class="text-red-500">*</span></label>
+                                <input type="email" name="email"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+                                    placeholder="contoh@perusahaan.com" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Nama Responden: <span
+                                        class="text-red-500">*</span></label>
+                                <input type="text" name="nama_responden"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+                                    placeholder="Nama Lengkap" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Jabatan: <span
+                                        class="text-red-500">*</span></label>
+                                <input type="text" name="jabatan"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+                                    placeholder="Contoh: HR Manager / Supervisor" required>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 font-semibold mb-2">Nama Instansi/Perusahaan: <span
+                                        class="text-red-500">*</span></label>
+                                <input type="text" name="nama_instansi"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+                                    placeholder="Nama Perusahaan atau Instansi Pemerintah" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Penilaian Kompetensi -->
+                    <div>
+                        <h3 class="text-xl font-bold text-primary-800 border-b-2 border-gold-400 pb-2 mb-6">II.
+                            Penilaian Kompetensi Lulusan</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full border-collapse">
+                                <thead>
+                                    <tr class="bg-primary-50 text-primary-800">
+                                        <th class="border p-4 text-left">Aspek Penilaian</th>
+                                        <th class="border p-4 text-center">Sangat Baik</th>
+                                        <th class="border p-4 text-center">Baik</th>
+                                        <th class="border p-4 text-center">Cukup</th>
+                                        <th class="border p-4 text-center">Kurang</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for aspect in aspects %}
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td class="border p-4 font-medium text-gray-700">
+                                            {{ aspect.label }}
+                                        </td>
+                                        <td class="border p-4 text-center">
+                                            <input type="radio" name="{{ aspect.name }}" value="Sangat Baik"
+                                                class="w-5 h-5 text-primary-600 focus:ring-primary-500" required>
+                                        </td>
+                                        <td class="border p-4 text-center">
+                                            <input type="radio" name="{{ aspect.name }}" value="Baik"
+                                                class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        </td>
+                                        <td class="border p-4 text-center">
+                                            <input type="radio" name="{{ aspect.name }}" value="Cukup"
+                                                class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        </td>
+                                        <td class="border p-4 text-center">
+                                            <input type="radio" name="{{ aspect.name }}" value="Kurang"
+                                                class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Indikator Kerja -->
+                    <div>
+                        <h3 class="text-xl font-bold text-primary-800 border-b-2 border-gold-400 pb-2 mb-6">III.
+                            Indikator Kinerja Lulusan</h3>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-4">Secara rata-rata, berapa lama waktu
+                                tunggu lulusan kami untuk mendapatkan pekerjaan di tempat Bapak/Ibu sejak kelulusan
+                                mereka? <span class="text-red-500">*</span></label>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <label
+                                    class="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-primary-300 transition">
+                                    <input type="radio" name="waktu_tunggu" value="WT < 3"
+                                        class="w-5 h-5 text-primary-600 focus:ring-primary-500" required>
+                                    <span class="text-gray-700">WT < 3 Bulan (Sangat Cepat)</span>
+                                </label>
+                                <label
+                                    class="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-primary-300 transition">
+                                    <input type="radio" name="waktu_tunggu" value="6 <= WT <= 18"
+                                        class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                    <span class="text-gray-700">6 ≤ WT ≤ 18 Bulan</span>
+                                </label>
+                                <label
+                                    class="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-primary-300 transition">
+                                    <input type="radio" name="waktu_tunggu" value="WT < 18"
+                                        class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                    <span class="text-gray-700">WT < 18 Bulan</span>
+                                </label>
+                                <label
+                                    class="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-primary-300 transition">
+                                    <input type="radio" name="waktu_tunggu" value="24 <= WT <= 36"
+                                        class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                    <span class="text-gray-700">24 ≤ WT ≤ 36 Bulan</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-6">
+                        <button type="submit"
+                            class="w-full bg-gradient-to-r from-primary-700 to-primary-900 hover:from-primary-800 hover:to-black text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300">
+                            Kirim Hasil Survei
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <p class="text-center text-gray-500 mt-8 text-sm italic">
+                Seluruh data yang Bapak/Ibu berikan akan dijaga kerahasiaannya dan hanya digunakan untuk kepentingan
+                pengembangan institusi.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

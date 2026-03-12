@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Slider -->
+<section class="relative overflow-hidden">
+    <div class="slider-container relative">
+        {% if slides %}
+        <div id="slider" class="grid grid-cols-1">
+            {% for slide in slides %}
+            <div
+                class="slide col-start-1 row-start-1 transition-opacity duration-1000 {% if forloop.first %}opacity-100{% else %}opacity-0{% endif %}">
+                <img src="{{ slide.image.url }}" alt="{{ slide.title }}" class="w-full h-auto">
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Slider Controls -->
+        <button onclick="changeSlide(-1)"
+            class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white p-3 rounded-full transition z-10">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button onclick="changeSlide(1)"
+            class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white p-3 rounded-full transition z-10">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- Slider Indicators -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
+            {% for slide in slides %}
+            <button onclick="goToSlide(Number('{{ forloop.counter0 }}'))"
+                class="w-3 h-3 rounded-full bg-white/50 hover:bg-white transition {% if forloop.first %}bg-white{% endif %} slide-indicator"></button>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="h-full gradient-purple-gold flex items-center justify-center">
+            <div class="text-center text-white">
+                <h2 class="text-5xl font-bold mb-4">Program Studi Sistem Informasi</h2>
+                <p class="text-xl">Universitas Nurdin Hamzah</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Sambutan Ketua Prodi -->
+{% if sambutan %}
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="relative">
+            <h2 class="text-3xl font-bold text-primary-700 mb-6">{{ sambutan.title }}</h2>
+
+            <!-- Photo positioned at top left -->
+            <div class="float-left mr-6 mb-6 w-32 md:w-36">
+                {% if sambutan.ketua_photo %}
+                <img src="{{ sambutan.ketua_photo.url }}" alt="{{ sambutan.ketua_name }}"
+                    class="rounded-lg shadow-lg w-full">
+                {% else %}
+                <div
+                    class="bg-gradient-to-br from-primary-500 to-gold-500 rounded-lg shadow-lg w-full h-36 flex items-center justify-center">
+                    <i class="fas fa-user text-white text-4xl"></i>
+                </div>
+                {% endif %}
+                <!-- Name and position under photo -->
+                <div class="mt-2 text-center">
+                    <p class="font-bold text-primary-800 text-sm">{{ sambutan.ketua_name }}</p>
+                    <p class="text-gray-600 text-xs">{{ sambutan.jabatan }}</p>
+                </div>
+            </div>
+
+            <!-- Content with justified text -->
+            <div class="text-gray-700 leading-relaxed text-justify-custom">
+                {{ sambutan.content|safe }}
+            </div>
+
+            <!-- Clear float -->
+            <div class="clear-both"></div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Quick Stats -->
+<section class="py-12 gradient-purple-gold">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center text-white">
+            <div class="hover-scale cursor-pointer">
+                <div class="text-5xl font-bold mb-2">15+</div>
+                <div class="text-gold-200">Dosen Berkualitas</div>
+            </div>
+            <div class="hover-scale cursor-pointer">
+                <div class="text-5xl font-bold mb-2">500+</div>
+                <div class="text-gold-200">Mahasiswa Aktif</div>
+            </div>
+            <div class="hover-scale cursor-pointer">
+                <div class="text-5xl font-bold mb-2">Baik Sekali</div>
+                <div class="text-gold-200">Akreditasi</div>
+            </div>
+            <div class="hover-scale cursor-pointer">
+                <div class="text-5xl font-bold mb-2">300+</div>
+                <div class="text-gold-200">Alumni Sukses</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- News Section -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-primary-700 mb-3">Berita Terkini</h2>
+            <div class="w-24 h-1 bg-gold-500 mx-auto"></div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            {% for item in news %}
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover-scale flex flex-col h-full">
+                <img src="{{ item.thumbnail.url }}" alt="{{ item.title }}"
+                    class="w-1/4 h-auto mx-auto mt-4 object-cover flex-shrink-0">
+                <div class="p-6 flex flex-col flex-1">
+                    <div class="text-xs text-gray-500 mb-2">
+                        <i class="far fa-calendar mr-1"></i> {{ item.published_date|date:"d M Y" }}
+                        <span class="mx-2">•</span>
+                        <i class="far fa-eye mr-1"></i> {{ item.views }}
+                    </div>
+                    <h3 class="text-xl font-bold text-primary-800 mb-3 line-clamp-2">{{ item.title }}</h3>
+                    <div class="mt-auto">
+                        <a href="{% url 'news_detail' item.slug %}"
+                            class="text-gold-600 hover:text-gold-700 font-semibold">
+                            Baca Selengkapnya <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-3 text-center text-gray-500 py-8">
+                Belum ada berita yang dipublikasikan
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if news %}
+        <div class="text-center mt-8">
+            <a href="{% url 'media_informasi' %}"
+                class="inline-block bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition">
+                Lihat Semua Berita
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Gallery Preview -->
+{% if gallery %}
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-primary-700 mb-3">Gallery</h2>
+            <div class="w-24 h-1 bg-gold-500 mx-auto"></div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {% for item in gallery %}
+            <div class="relative overflow-hidden rounded-lg shadow-lg hover-scale cursor-pointer group">
+                {% if item.media_type == 'image' %}
+                <img src="{{ item.image.url }}" alt="{{ item.title }}" class="w-full h-64 object-cover">
+                {% else %}
+                <div
+                    class="w-full h-64 bg-gradient-to-br from-primary-500 to-gold-500 flex items-center justify-center">
+                    <i class="fas fa-play-circle text-white text-6xl"></i>
+                </div>
+                {% endif %}
+                <div
+                    class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                    <p class="text-white p-4 font-semibold">{{ item.title }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-8">
+            <a href="{% url 'media_informasi' %}"
+                class="inline-block bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition">
+                Lihat Semua Gallery
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+<section class="py-16 gradient-purple-gold text-white">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-4xl font-bold mb-4">Bergabunglah Bersama Kami!</h2>
+        <p class="text-xl mb-8 text-gold-200">Jadilah bagian dari Program Studi Sistem Informasi UNH</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'profile' %}"
+                class="bg-white text-primary-700 hover:bg-gold-100 px-8 py-3 rounded-lg font-semibold transition">
+                Tentang Kami
+            </a>
+            <a href="{% url 'kemahasiswaan' %}"
+                class="bg-gold-500 hover:bg-gold-600 text-white px-8 py-3 rounded-lg font-semibold transition">
+                Info Mahasiswa
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const indicators = document.querySelectorAll('.slide-indicator');
+
+    function showSlide(n) {
+        if (slides.length === 0) return;
+
+        if (n >= slides.length) currentSlide = 0;
+        if (n < 0) currentSlide = slides.length - 1;
+
+        slides.forEach(slide => slide.classList.remove('opacity-100'));
+        slides.forEach(slide => slide.classList.add('opacity-0'));
+        slides[currentSlide].classList.remove('opacity-0');
+        slides[currentSlide].classList.add('opacity-100');
+
+        indicators.forEach(indicator => indicator.classList.remove('bg-white'));
+        indicators.forEach(indicator => indicator.classList.add('bg-white/50'));
+        if (indicators[currentSlide]) {
+            indicators[currentSlide].classList.remove('bg-white/50');
+            indicators[currentSlide].classList.add('bg-white');
+        }
+    }
+
+    function changeSlide(n) {
+        currentSlide += n;
+        showSlide(currentSlide);
+    }
+
+    function goToSlide(n) {
+        currentSlide = n;
+        showSlide(currentSlide);
+    }
+
+    // Auto slide
+    if (slides.length > 0) {
+        setInterval(() => {
+            currentSlide++;
+            showSlide(currentSlide);
+        }, 5000);
+    }
+</script>
+{% endblock %}

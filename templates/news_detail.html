@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}{{ news.title }} - SI UNH{% endblock %}
+{% block content %}
+<article class="py-16">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-primary-800 mb-4">{{ news.title }}</h1>
+                <div class="flex items-center text-gray-600 text-sm mb-6">
+                    <i class="far fa-calendar mr-2"></i> {{ news.published_date|date:"d F Y" }}
+                    <span class="mx-3">•</span>
+                    <i class="far fa-user mr-2"></i> {{ news.author.get_full_name|default:news.author.username }}
+                    <span class="mx-3">•</span>
+                    <i class="far fa-eye mr-2"></i> {{ news.views }} views
+                </div>
+            </div>
+            <div class="prose max-w-none text-justify-custom">
+                <img src="{{ news.thumbnail.url }}" alt="{{ news.title }}"
+                    class="float-left mr-6 mb-4 w-48 rounded-lg shadow-lg">
+                {{ news.content|safe }}
+            </div>
+            <div class="clear-both mt-8 pt-8 border-t">
+                <a href="{% url 'media_informasi' %}" class="text-primary-600 hover:text-primary-800 font-semibold">
+                    ← Kembali ke Berita
+                </a>
+            </div>
+        </div>
+        {% if recent_news %}
+        <div class="mt-12 max-w-4xl mx-auto">
+            <h3 class="text-2xl font-bold text-primary-700 mb-6">Berita Lainnya</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                {% for item in recent_news %}
+                <a href="{% url 'news_detail' item.slug %}"
+                    class="block bg-white rounded-lg shadow hover:shadow-lg transition">
+                    <img src="{{ item.thumbnail.url }}" alt="{{ item.title }}"
+                        class="w-full h-40 object-cover rounded-t-lg">
+                    <div class="p-4">
+                        <h4 class="font-semibold text-primary-800 line-clamp-2">{{ item.title }}</h4>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</article>
+{% endblock %}

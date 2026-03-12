@@ -1,0 +1,15 @@
+CARA MENJALANKAN DI MAC OS
+
+1. Buka Terminal.
+2. Ketik 'cd' (tanpa kutip), tekan spasi, lalu drag folder 'si_unh_website' ke terminal. Tekan Enter.
+3. Jalankan perintah ini untuk menyalakan server:
+   ./run_server.sh
+
+4. Tekan Enter.
+5. Buka browser dan akses: http://127.0.0.1:8000/
+
+Untuk menghentikan server:
+Tekan tombol Control + C di terminal.
+
+Untuk menjalankan ulang jika sudah keluar:
+Ulangi langkah 1-3.

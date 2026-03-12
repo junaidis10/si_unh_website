@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block title %}Statistik Survei VMTS - Admin{% endblock %}
+
+{% block content %}
+<section class="gradient-purple-gold text-white py-12">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+        <div>
+            <h1 class="text-4xl font-bold mb-2">Statistik Survei VMTS</h1>
+            <p class="text-gold-200">Analisis Pemahaman Visi, Misi, Tujuan dan Sasaran Prodi</p>
+        </div>
+        <div class="flex space-x-4">
+            <a href="{% url 'export_vmts_excel' %}"
+                class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold flex items-center shadow-lg transition">
+                <i class="fas fa-file-excel mr-2"></i> Export to Excel
+            </a>
+            <a href="{% url 'admin_dashboard' %}"
+                class="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-lg font-bold flex items-center transition">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="py-12 bg-gray-50">
+    <div class="container mx-auto px-4">
+        {% if empty %}
+        <div class="bg-white rounded-xl shadow p-12 text-center">
+            <i class="fas fa-chart-pie text-6xl text-gray-300 mb-4"></i>
+            <h2 class="text-2xl font-bold text-gray-600">Belum ada data survei VMTS</h2>
+            <p class="text-gray-500 mt-2">Data statistik akan muncul setelah ada responden yang mengisi survei.</p>
+        </div>
+        {% else %}
+        <div class="grid md:grid-cols-4 gap-6 mb-12">
+            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-primary-500">
+                <p class="text-gray-500 text-sm font-bold uppercase">Total Responden</p>
+                <p class="text-3xl font-black text-primary-800">{{ total_responden }}</p>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Status Responden Chart -->
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Distribusi Status Responden</h3>
+                <canvas id="statusChart" height="300"></canvas>
+            </div>
+
+            <!-- Tingkat Pemahaman Chart -->
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Tingkat Pemahaman VMTS</h3>
+                <canvas id="pahamChart" height="300"></canvas>
+            </div>
+
+            <!-- Frekuensi Sosialisasi Chart -->
+            <div class="bg-white p-8 rounded-xl shadow-lg md:col-span-2">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Frekuensi Sosialisasi VMTS</h3>
+                <canvas id="sosChart" height="150"></canvas>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    {% if not empty %}
+    // Status Chart
+    const ctxStatus = document.getElementById('statusChart').getContext('2d');
+    new Chart(ctxStatus, {
+        type: 'pie',
+        data: {
+            labels: [{% for item in status_dist %}"{{ item.status|title }}",{% endfor %}],
+        datasets: [{
+            data: [{% for item in status_dist %}{{ item.total }}, {% endfor %}],
+        backgroundColor: ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#8B5CF6']
+            }]
+        }
+    });
+
+    // Paham Chart
+    const ctxPaham = document.getElementById('pahamChart').getContext('2d');
+    new Chart(ctxPaham, {
+        type: 'doughnut',
+        data: {
+            labels: [{% for item in tingkat_paham_dist %}"{{ item.tingkat_paham }}",{% endfor %}],
+        datasets: [{
+            data: [{% for item in tingkat_paham_dist %}{{ item.total }}, {% endfor %}],
+        backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444']
+            }]
+        }
+    });
+
+    // Sosialisasi Chart
+    const ctxSos = document.getElementById('sosChart').getContext('2d');
+    new Chart(ctxSos, {
+        type: 'bar',
+        data: {
+            labels: [{% for item in frekuensi_sos_dist %}"{{ item.frekuensi_sosialisasi }}",{% endfor %}],
+        datasets: [{
+            label: 'Jumlah Responden',
+            data: [{% for item in frekuensi_sos_dist %}{{ item.total }}, {% endfor %}],
+        backgroundColor: 'rgba(79, 70, 229, 0.6)',
+        borderColor: 'rgb(79, 70, 229)',
+        borderWidth: 1
+            }]
+        },
+        options: {
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        }
+    }
+    });
+    {% endif %}
+</script>
+{% endblock %}

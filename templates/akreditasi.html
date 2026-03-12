@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Akreditasi - SI UNH{% endblock %}
+
+{% block content %}
+<section class="gradient-purple-gold text-white py-16">
+ <div class="container mx-auto px-4 text-center">
+ <h1 class="text-5xl font-bold mb-4">Akreditasi</h1>
+ <p class="text-xl text-gold-200">Program Studi Sistem Informasi</p>
+ </div>
+</section>
+
+<section class="py-16 bg-white">
+ <div class="container mx-auto px-4">
+ {% if akreditasi_list %}
+ {% for akred in akreditasi_list %}
+ <div class="max-w-4xl mx-auto mb-8 bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg shadow-lg p-8">
+ <div class="flex items-center justify-between mb-6">
+ <div>
+ <h2 class="text-3xl font-bold text-primary-800 mb-2">{{ akred.program }}</h2>
+ <p class="text-xl text-gold-700 font-semibold">Peringkat: {{ akred.peringkat }}</p>
+ </div>
+ <div class="flex-shrink-0 ml-4">
+ <img src="{% static 'img/badge-baik-sekali.png' %}" alt="Terakreditasi Baik Sekali"
+ class="w-28 h-28 md:w-32 md:h-32 object-contain"
+ style="background: white; border-radius: 50%; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+ </div>
+ </div>
+ <div class="grid md:grid-cols-2 gap-4 text-gray-700">
+ <div>
+ <p class="mb-2"><i class="fas fa-file-contract mr-2 text-primary-600"></i><strong>No. SK:</strong>
+ {{ akred.nomor_sk }}</p>
+ <p><i class="fas fa-calendar mr-2 text-primary-600"></i><strong>Tanggal SK:</strong> {{ akred.tanggal_sk|date:"d F Y" }}</p>
+ </div>
+ <div>
+ <p class="mb-2"><i class="fas fa-building mr-2 text-gold-600"></i><strong>Lembaga:</strong> {{ akred.lembaga }}</p>
+ <p><i class="fas fa-calendar-check mr-2 text-gold-600"></i><strong>Berlaku Hingga:</strong> {{ akred.masa_berlaku|date:"d F Y" }}</p>
+ </div>
+ </div>
+ <div class="mt-6">
+ <a href="{{ akred.certificate_file.url }}" target="_blank"
+ class="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition">
+ <i class="fas fa-download mr-2"></i> Download Sertifikat
+ </a>
+ </div>
+ </div>
+ {% endfor %}
+ {% endif %}
+ </div>
+</section>
+
+<section class="py-16 bg-gray-50">
+ <div class="container mx-auto px-4">
+ <div class="grid md:grid-cols-2 gap-8">
+ <div>
+ <h3 class="text-2xl font-bold text-primary-700 mb-6">Laporan Evaluasi Diri (LED)</h3>
+
+ <!-- Tombol Akses Utama (Selalu Muncul) -->
+ <div class="mb-6">
+ <a href="http://localhost:8001" target="_blank" rel="noopener noreferrer"
+ class="inline-flex items-center px-6 py-3 bg-primary-600 text-white hover:bg-primary-700 rounded-lg transition-all font-bold shadow-lg hover:shadow-xl">
+ <i class="fas fa-external-link-alt mr-2"></i> Akses Sistem LED (Port 8001)
+ </a>
+ </div>
+
+ {% if led_docs %}
+ <div class="space-y-4">
+ {% for doc in led_docs %}
+ <div class="bg-white p-4 rounded-lg shadow">
+ <h4 class="font-semibold mb-2">{{ doc.title }}</h4>
+ <a href="{% url 'download_document' doc.id %}" class="text-primary-600 hover:text-primary-800">
+ <i class="fas fa-download mr-1"></i> Download File
+ </a>
+ </div>
+ {% endfor %}
+ </div>
+ {% else %}
+ <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+ <p class="text-blue-700 text-sm">
+ <i class="fas fa-info-circle mr-2"></i> Belum ada dokumen fisik yang diunggah ke kategori LED.
+ </p>
+ </div>
+ {% endif %}
+ </div>
+ <div>
+ <h3 class="text-2xl font-bold text-primary-700 mb-6">LKPS</h3>
+ {% if lkps_docs %}
+ <div class="space-y-4">
+ {% for doc in lkps_docs %}
+ <div class="bg-white p-4 rounded-lg shadow">
+ <h4 class="font-semibold mb-2">{{ doc.title }}</h4>
+ <a href="{% url 'download_document' doc.id %}" class="text-primary-600 hover:text-primary-800">
+ <i class="fas fa-download mr-1"></i> Download
+ </a>
+ </div>
+ {% endfor %}
+ </div>
+ {% else %}
+ <p class="text-gray-600">Belum ada dokumen LKPS</p>
+ {% endif %}
+ </div>
+ </div>
+ </div>
+</section>
+{% endblock %}

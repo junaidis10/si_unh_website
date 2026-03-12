@@ -1,0 +1,366 @@
+{% extends 'base.html' %}
+{% load survey_extras %}
+{% block title %}Survei Evaluasi Kurikulum - SI UNH{% endblock %}
+
+{% block content %}
+<section class="gradient-purple-gold text-white py-16">
+ <div class="container mx-auto px-4 text-center">
+ <h1 class="text-4xl md:text-5xl font-bold mb-4">Survei Evaluasi Kurikulum</h1>
+ <p class="text-xl text-gold-200">Pengembangan Kurikulum Berbasis OBE/KKNI/SKKNI & APTIKOM</p>
+ </div>
+</section>
+
+<section class="py-12 bg-gray-50">
+ <div class="container mx-auto px-4">
+ <div class="max-w-4xl mx-auto">
+ <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+ <div class="bg-primary-700 text-white p-6">
+ <h2 class="text-2xl font-bold mb-2">Instruksi Pengisian</h2>
+ <p class="text-primary-100">Pilih kategori responden Anda untuk menampilkan instrumen survei yang
+ sesuai. Masukan Anda sangat berharga untuk penyempurnaan kurikulum Program Studi Sistem
+ Informasi UNH.</p>
+ </div>
+
+ <form method="post" id="surveyForm" class="p-8 space-y-8">
+ {% csrf_token %}
+
+ <!-- Identitas Dasar -->
+ <div class="space-y-6">
+ <h3 class="text-xl font-bold text-primary-800 border-b-2 border-gold-400 pb-2 mb-4">Identitas
+ Responden</h3>
+ <div class="grid md:grid-cols-2 gap-6">
+ <div class="md:col-span-2">
+ <label class="block text-gray-700 font-semibold mb-2">Nama Lengkap <span
+ class="text-red-500">*</span></label>
+ <input type="text" name="nama_responden" id="id_nama_responden"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+ required placeholder="Nama Lengkap">
+ </div>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">Kategori Responden <span
+ class="text-red-500">*</span></label>
+ <select name="kategori_responden" id="categorySelect"
+ class="w-full px-4 py-3 rounded-lg border-2 border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-primary-50 font-bold text-primary-900"
+ required>
+ <option value="" disabled selected>-- Pilih Kategori --</option>
+ <option value="alumni">ALUMNI (Tracer Study)</option>
+ <option value="pengguna">PENGGUNA LULUSAN (Industri)</option>
+ <option value="pakar">DEWAN PAKAR (Expert Review)</option>
+ <option value="stakeholder">STAKEHOLDER (Mitra/Pemerintah)</option>
+ </select>
+ </div>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">Instansi/Perusahaan <span
+ class="text-red-500">*</span></label>
+ <input type="text" name="instansi" id="id_instansi"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+ required placeholder="Nama Instansi">
+ </div>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">Jabatan saat ini</label>
+ <input type="text" name="jabatan"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+ placeholder="Jabatan">
+ </div>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">Email</label>
+ <input type="email" name="email"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+ placeholder="Email (Opsional)">
+ </div>
+ </div>
+ </div>
+
+ <!-- INSTRUMEN 1: ALUMNI -->
+ <div id="section_alumni" class="instrument-section hidden space-y-8 animate-fadeIn">
+ <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500 mb-6">
+ <h4 class="font-bold text-blue-800">INSTRUMEN 1: SURVEI ALUMNI</h4>
+ <p class="text-sm text-blue-700">Tracer Study & Relevansi Kurikulum</p>
+ </div>
+
+ <div class="space-y-4">
+ <h4 class="font-bold text-gray-800">Bagian A: Profil Pekerjaan</h4>
+ <label class="block text-gray-700">Apakah pekerjaan Anda saat ini sesuai dengan profil
+ lulusan yang dicanangkan Prodi SI UNH?</label>
+ <div class="space-y-2">
+ {% for val in "Pengembang Sistem Informasi (System Analyst/Developer),Pengelola Sistem Informasi (IT Manager/Support),Spesialis Data (Database Admin/Data Analyst),Tata Kelola SI (IT Auditor/Governance),Technopreneur (Wirausahawan Digital),Lainnya"|split:"," %}
+ <label
+ class="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer">
+ <input type="radio" name="alumni_profil_kesesuaian" value="{{ val }}"
+ class="w-4 h-4 text-primary-600">
+ <span>{{ val }}</span>
+ </label>
+ {% endfor %}
+ </div>
+ </div>
+
+ <div class="space-y-4">
+ <h4 class="font-bold text-gray-800">Bagian B: Evaluasi Kompetensi (Berdasarkan CPL)</h4>
+ <p class="text-sm text-gray-600 italic">Skala: 1 (Sangat Kurang) s.d 4 (Sangat Baik)</p>
+ <table class="w-full text-left border-collapse">
+ <thead>
+ <tr class="bg-gray-100">
+ <th class="p-3 border">Kompetensi</th>
+ <th class="p-3 border text-center w-32">Skala 1-4</th>
+ </tr>
+ </thead>
+ <tbody>
+ {% for field, label in "sikap:Sikap & Etika (Kerjasama tim etika profesi),konsep:Konsep SI (Manajemen SI & Proses Bisnis),teknis:Teknis Pemrograman (Algoritma Web Mobile),data:Manajemen Data (Database & Analisis Data),tata_kelola:Tata Kelola & Audit (Audit SI Manajemen Risiko),techno:Technopreneurship (Bisnis Digital)"|split_items %}
+ <tr>
+ <td class="p-3 border">{{ label }}</td>
+ <td class="p-3 border text-center">
+ <div class="flex justify-center space-x-2">
+ {% for i in "1234"|make_list %}
+ <input type="radio" name="alumni_cpl_{{ field }}" value="{{ i }}"
+ title="Skala {{ i }}">
+ {% endfor %}
+ </div>
+ </td>
+ </tr>
+ {% endfor %}
+ </tbody>
+ </table>
+ </div>
+
+ <div class="space-y-4">
+ <h4 class="font-bold text-gray-800">Bagian C: Umpan Balik Mata Kuliah</h4>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">Sebutkan 3 Mata Kuliah yang paling
+ bermanfaat di dunia kerja Anda saat ini:</label>
+ <textarea name="alumni_mk_bermanfaat" rows="2"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"
+ placeholder="1... 2... 3..."></textarea>
+ </div>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">Sebutkan materi/teknologi yang
+ Anda butuhkan di tempat kerja tetapi tidak/kurang diajarkan saat kuliah (Gap
+ Analysis):</label>
+ <textarea name="alumni_gap_analysis" rows="2"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"></textarea>
+ </div>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">Bagaimana penilaian Anda terhadap
+ program MBKM (Magang/Studi Independen)? Apakah membantu transisi ke dunia
+ kerja?</label>
+ <textarea name="alumni_mbkm_eval" rows="2"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"></textarea>
+ </div>
+ </div>
+ </div>
+
+ <!-- INSTRUMEN 2: PENGGUNA LULUSAN -->
+ <div id="section_pengguna" class="instrument-section hidden space-y-8 animate-fadeIn">
+ <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500 mb-6">
+ <h4 class="font-bold text-green-800">INSTRUMEN 2: SURVEI PENGGUNA LULUSAN</h4>
+ <p class="text-sm text-green-700">User/Industri - Validasi CPL & SKKNI</p>
+ </div>
+
+ <div class="space-y-4">
+ <h4 class="font-bold text-gray-800">Bagian A: Kepuasan Terhadap Lulusan</h4>
+ <p class="text-sm text-gray-600 italic">Skala: 1 (Kurang) - 4 (Sangat Baik)</p>
+ <div class="space-y-4">
+ {% for field, label in "integritas:Integritas & Etika,keahlian_si:Keahlian Sistem Informasi (Analisis Sistem),keahlian_teknis:Keahlian Teknis (Coding Database Jaringan),soft_skill:Keahlian Non-Teknis (Komunikasi Soft Skill),adaptasi:Kemampuan Adaptasi Teknologi Baru"|split_items %}
+ <div
+ class="flex flex-col md:flex-row md:items-center justify-between p-3 border rounded">
+ <span class="font-medium">{{ label }}</span>
+ <div class="flex space-x-4 mt-2 md:mt-0">
+ {% for i in "1234"|make_list %}<label class="flex items-center space-x-1"><input
+ type="radio" name="user_eval_{{ field }}" value="{{ i }}"><span>{{ i }}</span></label>{% endfor %}
+ </div>
+ </div>
+ {% endfor %}
+ </div>
+ </div>
+
+ <div class="space-y-4">
+ <h4 class="font-bold text-gray-800">Bagian B: Kesesuaian Kebutuhan Industri</h4>
+ <label class="block text-gray-700 font-semibold">Menurut Anda, apakah lulusan kami sudah
+ memenuhi standar kompetensi (SKKNI) untuk posisi yang mereka tempati?</label>
+ <div class="flex flex-wrap gap-4">
+ <label class="flex items-center space-x-2"><input type="radio" name="user_skkni"
+ value="Ya Sepenuhnya"> <span>Ya, Sepenuhnya</span></label>
+ <label class="flex items-center space-x-2"><input type="radio" name="user_skkni"
+ value="Sebagian Besar"> <span>Sebagian Besar</span></label>
+ <label class="flex items-center space-x-2"><input type="radio" name="user_skkni"
+ value="Masih Kurang"> <span>Masih Kurang</span></label>
+ </div>
+ <div class="mt-4">
+ <label class="block text-gray-700 font-semibold mb-2">Teknologi atau Tools apa yang saat
+ ini wajib dikuasai oleh lulusan SI namun belum terlihat pada lulusan kami?</label>
+ <textarea name="user_tech_gap" rows="2"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"
+ placeholder="Misal: Cloud, Big Data, AI..."></textarea>
+ </div>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">Saran agar lulusan lebih siap
+ menghadapi bisnis digital (Visi Technopreneur):</label>
+ <textarea name="user_techno_saran" rows="2"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"></textarea>
+ </div>
+ </div>
+ </div>
+
+ <!-- INSTRUMEN 3: DEWAN PAKAR -->
+ <div id="section_pakar" class="instrument-section hidden space-y-8 animate-fadeIn">
+ <div class="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-500 mb-6">
+ <h4 class="font-bold text-indigo-800">INSTRUMEN 3: SURVEI DEWAN PAKAR</h4>
+ <p class="text-sm text-indigo-700">Expert Review - APTIKOM/KKNI</p>
+ </div>
+
+ <div class="space-y-6">
+ <h4 class="font-bold text-gray-800 border-l-4 border-indigo-300 pl-3">Bagian A: Struktur
+ Kurikulum</h4>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">1. Apakah susunan mata kuliah dari
+ Semester 1 s.d 8 sudah logis (prasyarat terpenuhi) dan membangun kompetensi secara
+ bertahap?</label>
+ <textarea name="pakar_struktur_logis" rows="3"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"></textarea>
+ </div>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">2. Apakah proporsi antara Teori
+ (Konsep SI) dan Praktik (Skill Teknis) sudah seimbang sesuai jenjang S1 (Level 6
+ KKNI)?</label>
+ <textarea name="pakar_proporsi_teori" rows="3"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"></textarea>
+ </div>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">3. Apakah Mata Kuliah Pilihan
+ sudah relevan dengan tren masa depan?</label>
+ <textarea name="pakar_mk_pilihan" rows="3"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"></textarea>
+ </div>
+ </div>
+
+ <div class="space-y-6">
+ <h4 class="font-bold text-gray-800 border-l-4 border-indigo-300 pl-3">Bagian B: Evaluasi CPL
+ </h4>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">4. Apakah rumusan CPL Keterampilan
+ Khusus sudah cukup spesifik membedakan lulusan SI dengan Teknik Informatika?</label>
+ <textarea name="pakar_cpl_spesifik" rows="3"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"></textarea>
+ </div>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">5. Penilaian terhadap integrasi
+ kurikulum dengan kebijakan MBKM & konversi SKS:</label>
+ <textarea name="pakar_mbkm_integrasi" rows="3"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"></textarea>
+ </div>
+ </div>
+
+ <div>
+ <h4 class="font-bold text-gray-800 border-l-4 border-indigo-300 pl-3 mb-2">Bagian C:
+ Rekomendasi</h4>
+ <label class="block text-gray-700 font-semibold mb-2">Masukan spesifik untuk perbaikan Peta
+ Jalan (Roadmap) Keilmuan Prodi:</label>
+ <textarea name="pakar_roadmap_saran" rows="4"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"
+ placeholder="Berikan rekomendasi ahli Anda..."></textarea>
+ </div>
+ </div>
+
+ <!-- INSTRUMEN 4: STAKEHOLDER -->
+ <div id="section_stakeholder" class="instrument-section hidden space-y-8 animate-fadeIn">
+ <div class="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500 mb-6">
+ <h4 class="font-bold text-orange-800">INSTRUMEN 4: SURVEI STAKEHOLDER</h4>
+ <p class="text-sm text-orange-700">Mitra MBKM & Pemerintah - Dampak Regional</p>
+ </div>
+
+ <div class="space-y-6">
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">1. Kesiapan Kerjasama: Seberapa
+ besar minat institusi Anda untuk menerima mahasiswa Prodi SI UNH dalam program
+ Magang/MBKM?</label>
+ <div class="flex gap-4 mb-2">
+ {% for i in "Sangat Tinggi,Cukup Tinggi,Sedang,Rendah"|split:"," %}<label
+ class="flex items-center space-x-2"><input type="radio"
+ name="stakeholder_kerjasama_minat" value="{{ i }}"><span>{{ i }}</span></label>{% endfor %}
+ </div>
+ <textarea name="stakeholder_kerjasama_note" rows="2"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"
+ placeholder="Catatan tambahan..."></textarea>
+ </div>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">2. Relevansi Regional: Apakah
+ Profil Lulusan sudah sesuai dengan kebutuhan ekonomi digital wilayah LLDIKTI 10
+ (Sumbar, Riau, Jambi, Kepri)?</label>
+ <textarea name="stakeholder_relevansi_regional" rows="3"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"></textarea>
+ </div>
+ <div>
+ <label class="block text-gray-700 font-semibold mb-2">3. Saran Pengembangan: Isu
+ strategis daerah/nasional apa yang sebaiknya masuk kurikulum? (Misal: Smart City,
+ E-Gov, UMKM Digital)</label>
+ <textarea name="stakeholder_isu_strategis" rows="3"
+ class="w-full px-4 py-3 rounded-lg border border-gray-300"></textarea>
+ </div>
+ </div>
+ </div>
+
+ <div id="submitButtonContainer" class="pt-6 hidden">
+ <button type="submit" id="submitBtn"
+ class="w-full bg-gradient-to-r from-primary-600 to-primary-800 hover:from-primary-700 hover:to-primary-900 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300">
+ Kirim Form Survei Kurikulum
+ </button>
+ </div>
+ </form>
+ </div>
+
+ <p class="text-center text-gray-500 mt-8 text-sm">
+ &copy; 2026 Program Studi Sistem Informasi - Universitas Nurdin Hamzah
+ </p>
+ </div>
+ </div>
+</section>
+
+<script>
+ document.addEventListener('DOMContentLoaded', function () {
+ const categorySelect = document.getElementById('categorySelect');
+ const sections = document.querySelectorAll('.instrument-section');
+ const submitDiv = document.getElementById('submitButtonContainer');
+ const form = document.getElementById('surveyForm');
+
+ categorySelect.addEventListener('change', function () {
+ const selectedVal = this.value;
+ console.log('Category changed to:', selectedVal);
+
+ // Hide all
+ sections.forEach(s => s.classList.add('hidden'));
+
+ // Show selected
+ const target = document.getElementById('section_' + selectedVal);
+ if (target) {
+ target.classList.remove('hidden');
+ submitDiv.classList.remove('hidden');
+ }
+ });
+
+ form.addEventListener('submit', function (e) {
+ console.log('Form submitting...');
+ const btn = document.getElementById('submitBtn');
+ btn.innerHTML = 'Sedang mengirim...';
+ btn.disabled = true;
+ btn.classList.add('opacity-50', 'cursor-not-allowed');
+ });
+ });
+</script>
+
+<style>
+ .animate-fadeIn {
+ animation: fadeIn 0.5s ease-in forwards;
+ }
+
+ @keyframes fadeIn {
+ from {
+ opacity: 0;
+ transform: translateY(10px);
+ }
+
+ to {
+ opacity: 1;
+ transform: translateY(0);
+ }
+ }
+</style>
+{% endblock %}

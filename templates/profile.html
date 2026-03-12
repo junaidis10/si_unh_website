@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile Prodi - SI UNH{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="gradient-purple-gold text-white py-16">
+    <div class="container mx-auto px-4 text-center">
+        <h1 class="text-5xl font-bold mb-4">Profile Program Studi</h1>
+        <p class="text-xl text-gold-200">Sistem Informasi - Universitas Nurdin Hamzah</p>
+    </div>
+</section>
+
+<!-- Visi Misi -->
+{% if visi_misi %}
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold text-primary-700 mb-6 flex items-center">
+                    <i class="fas fa-eye text-gold-500 mr-3"></i> Visi
+                </h2>
+                <div class="prose max-w-none text-gray-700 bg-primary-50 p-6 rounded-lg">
+                    {{ visi_misi.visi|safe }}
+                </div>
+            </div>
+            
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold text-primary-700 mb-6 flex items-center">
+                    <i class="fas fa-bullseye text-gold-500 mr-3"></i> Misi
+                </h2>
+                <div class="prose max-w-none text-gray-700 bg-gold-50 p-6 rounded-lg">
+                    {{ visi_misi.misi|safe }}
+                </div>
+            </div>
+            
+            {% if visi_misi.tujuan %}
+            <div>
+                <h2 class="text-3xl font-bold text-primary-700 mb-6 flex items-center">
+                    <i class="fas fa-flag text-gold-500 mr-3"></i> Tujuan
+                </h2>
+                <div class="prose max-w-none text-gray-700 bg-purple-50 p-6 rounded-lg">
+                    {{ visi_misi.tujuan|safe }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Prospek dan Keunggulan -->
+{% if prospek %}
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-primary-700 mb-3">Prospek & Keunggulan Lulusan</h2>
+            <div class="w-24 h-1 bg-gold-500 mx-auto"></div>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for item in prospek %}
+            <div class="bg-white rounded-lg shadow-lg p-6 hover-scale">
+                <div class="w-16 h-16 gradient-purple-gold rounded-full flex items-center justify-center mb-4">
+                    {% if item.icon %}
+                    <i class="{{ item.icon }} text-white text-2xl"></i>
+                    {% else %}
+                    <i class="fas fa-briefcase text-white text-2xl"></i>
+                    {% endif %}
+                </div>
+                <h3 class="text-xl font-bold text-primary-800 mb-3">{{ item.title }}</h3>
+                <div class="prose text-gray-700">
+                    {{ item.description|safe }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Fasilitas -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-primary-700 mb-3">Fasilitas</h2>
+            <div class="w-24 h-1 bg-gold-500 mx-auto"></div>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="text-center p-6 bg-primary-50 rounded-lg hover-scale">
+                <div class="text-5xl text-primary-600 mb-4">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <h3 class="text-xl font-bold text-primary-800 mb-2">Laboratorium</h3>
+                <p class="text-gray-700">Laboratorium komputer dengan fasilitas modern dan lengkap</p>
+            </div>
+            
+            <div class="text-center p-6 bg-gold-50 rounded-lg hover-scale">
+                <div class="text-5xl text-gold-600 mb-4">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h3 class="text-xl font-bold text-primary-800 mb-2">Perpustakaan</h3>
+                <p class="text-gray-700">Koleksi buku dan jurnal ilmiah yang lengkap dan up-to-date</p>
+            </div>
+            
+            <div class="text-center p-6 bg-purple-50 rounded-lg hover-scale">
+                <div class="text-5xl text-purple-600 mb-4">
+                    <i class="fas fa-wifi"></i>
+                </div>
+                <h3 class="text-xl font-bold text-primary-800 mb-2">Internet</h3>
+                <p class="text-gray-700">Akses internet cepat di seluruh area kampus</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="py-16 gradient-purple-gold text-white">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold mb-4">Tertarik Bergabung?</h2>
+        <p class="text-xl mb-6 text-gold-200">Hubungi kami untuk informasi lebih lanjut</p>
+        <a href="{% url 'layanan' %}" class="inline-block bg-white text-primary-700 hover:bg-gold-100 px-8 py-3 rounded-lg font-semibold transition">
+            Hubungi Kami
+        </a>
+    </div>
+</section>
+{% endblock %}

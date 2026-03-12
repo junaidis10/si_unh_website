@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurikulum - SI UNH</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#faf5ff',
+                            100: '#f3e8ff',
+                            200: '#e9d5ff',
+                            300: '#d8b4fe',
+                            400: '#c084fc',
+                            500: '#a855f7',
+                            600: '#9333ea',
+                            700: '#7e22ce',
+                            800: '#6b21a8',
+                            900: '#581c87',
+                        },
+                        gold: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .gradient-purple-gold {
+            background: linear-gradient(135deg, #7e22ce 0%, #d97706 100%);
+        }
+
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar-scroll {
+            transition: all 0.3s ease;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Justified text styling */
+        .text-justify-custom {
+            text-align: justify;
+            text-justify: inter-word;
+            hyphens: auto;
+        }
+
+        .text-justify-custom p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        /* Responsive floating photo */
+        @media (max-width: 768px) {
+
+            .float-right,
+            .float-left {
+                float: none !important;
+                margin: 0 auto 1.5rem !important;
+                display: block;
+            }
+        }
+    </style>
+
+    
+</head>
+
+<body class="bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="gradient-purple-gold text-white shadow-lg sticky top-0 z-50 navbar-scroll">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between py-4">
+                <!-- Logo -->
+                <div class="flex items-center space-x-4">
+                    <img src="/media/logo-unh-smart.png" alt="Logo UNH" class="h-14 w-auto object-contain"
+                        onerror="this.style.display='none'">
+                    <div>
+                        <h1 class="text-xl font-bold">Sistem Informasi</h1>
+                        <p class="text-xs text-gold-200">Universitas Nurdin Hamzah</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden lg:flex items-center space-x-6">
+                    <a href="/"
+                        class="hover:text-gold-300 transition ">Home</a>
+                    <a href="/profile/"
+                        class="hover:text-gold-300 transition ">Profile
+                        Prodi</a>
+                    <a href="/akademik/"
+                        class="hover:text-gold-300 transition ">Akademik</a>
+
+                    <!-- Kurikulum Dropdown -->
+                    <div class="relative group">
+                        <a href="/kurikulum/"
+                            class="hover:text-gold-300 transition text-gold-400 font-semibold flex items-center">
+                            Kurikulum <i
+                                class="fas fa-chevron-down ml-1 text-xs transition-transform group-hover:rotate-180"></i>
+                        </a>
+                        <div
+                            class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 transform origin-top scale-95 group-hover:scale-100 divide-y divide-gray-100 overflow-hidden">
+                            <div class="py-1">
+                                <a href="/kurikulum/#kurikulum-obe-k23"
+                                    class="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition text-sm">
+                                    Kurikulum Berbasis OBE/KKNI/SKKNI dan Aptikom
+                                </a>
+                                <a href="/kurikulum/#kurikulum-kkni-k2017"
+                                    class="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition text-sm">
+                                    Kurikulum Berbasis KKNI K2017
+                                </a>
+                                <a href="/kurikulum/#daftar-matakuliah"
+                                    class="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition text-sm">
+                                    List Mata Kuliah dan Semester
+                                </a>
+                                <a href="/kurikulum/#rps"
+                                    class="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition text-sm">
+                                    Rencana Pembelajaran Semester (RPS)
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/akreditasi/"
+                        class="hover:text-gold-300 transition ">Akreditasi</a>
+                    <a href="/kemahasiswaan/"
+                        class="hover:text-gold-300 transition ">Kemahasiswaan
+                        & Alumni</a>
+                    <a href="/layanan/"
+                        class="hover:text-gold-300 transition ">Layanan</a>
+                    <a href="/media/"
+                        class="hover:text-gold-300 transition ">Media
+                        & Informasi</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="lg:hidden text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden lg:hidden pb-4">
+                <div class="flex flex-col space-y-3">
+                    <a href="/" class="hover:text-gold-300 transition py-2">Home</a>
+                    <a href="/profile/" class="hover:text-gold-300 transition py-2">Profile Prodi</a>
+                    <a href="/akademik/" class="hover:text-gold-300 transition py-2">Akademik</a>
+
+                    <!-- Mobile Kurikulum with Toggle -->
+                    <div>
+                        <button onclick="toggleMobileSubmenu('kurikulum-sub')"
+                            class="w-full flex justify-between items-center hover:text-gold-300 transition py-2">
+                            Kurikulum <i id="kurikulum-sub-icon"
+                                class="fas fa-chevron-down text-sm transition-transform"></i>
+                        </button>
+                        <div id="kurikulum-sub"
+                            class="hidden pl-4 flex flex-col space-y-1 mt-1 border-l-2 border-gold-400/30">
+                            <a href="/kurikulum/#kurikulum-obe-k23"
+                                class="hover:text-gold-300 transition py-2 text-sm">1. OBE/KKNI/SKKNI K23</a>
+                            <a href="/kurikulum/#kurikulum-kkni-k2017"
+                                class="hover:text-gold-300 transition py-2 text-sm">2. KKNI K2017</a>
+                            <a href="/kurikulum/#daftar-matakuliah"
+                                class="hover:text-gold-300 transition py-2 text-sm">3. List Mata Kuliah</a>
+                            <a href="/kurikulum/#rps" class="hover:text-gold-300 transition py-2 text-sm">4.
+                                RPS</a>
+                        </div>
+                    </div>
+
+                    <a href="/akreditasi/" class="hover:text-gold-300 transition py-2">Akreditasi</a>
+                    <a href="/kemahasiswaan/" class="hover:text-gold-300 transition py-2">Kemahasiswaan &
+                        Alumni</a>
+                    <a href="/layanan/" class="hover:text-gold-300 transition py-2">Layanan</a>
+                    <a href="/media/" class="hover:text-gold-300 transition py-2">Media &
+                        Informasi</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        
+<!-- Page Header -->
+<section class="gradient-purple-gold text-white py-16">
+    <div class="container mx-auto px-4 text-center">
+        <h1 class="text-5xl font-bold mb-4">Kurikulum</h1>
+        <p class="text-xl text-gold-200">Program Studi Sistem Informasi</p>
+    </div>
+</section>
+
+<!-- Kurikulum OBE K23 -->
+<section id="kurikulum-obe-k23" class="py-16 bg-white scroll-mt-20">
+    <div class="container mx-auto px-4">
+        <div class="text-justify mb-12">
+            <h2 class="text-4xl font-bold text-primary-700 mb-3 text-justify">Kurikulum Berbasis OBE/KKNI/SKKNI dan
+                Aptikom K23</h2>
+            <div class="w-24 h-1 bg-gold-500 mb-4"></div>
+            <div class="space-y-4 text-gray-600 text-justify">
+                <p>
+                    Kurikulum berbasis Outcome Based Education (OBE) K23 dirancang untuk menghasilkan lulusan yang
+                    kompeten sesuai kebutuhan industri digital masa kini. Kurikulum ini dikembangkan berdasarkan
+                    standar Aptikom K23, SKKNI, dan KKNI untuk memastikan relevansi global.
+                </p>
+                <p>
+                    Kurikulum ini dibangun di atas 3 pilar utama yaitu: komputer, manajemen, dan bisnis. Profil
+                    lulusan Program Studi Sistem Informasi memenuhi aspek sikap dan tata nilai, kompetensi umum
+                    dan kompetensi khusus sesuai Standar Kompetensi Kerja Nasional Indonesia (SKKNI).
+                </p>
+                <p class="font-semibold text-primary-700 mt-4">
+                    Tujuan utama kurikulum ini adalah menghasilkan lulusan yang mampu melaksanakan 5 peran strategis:
+                </p>
+            </div>
+
+            <div class="mt-8 grid md:grid-cols-2 gap-6">
+                <!-- Role 1 -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:shadow-lg transition duration-300">
+                    <div
+                        class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4 text-primary-600">
+                        <i class="fas fa-code text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-lg text-primary-700 mb-2">1. Pengembangan Sistem Informasi (P-SI.1)</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed text-justify">
+                        Peran ini diharapkan memiliki kemampuan menerapkan konsep-konsep dasar dalam merencanakan yang
+                        meliputi pengembangan perangkat lunak dan keuangan, merancang, membangun dan mengevaluasi Sistem
+                        Informasi. Profesi Lulusan dari profil ini adalah Manajer Proyek SI/TI, Analis Sistem (System
+                        Analyst), Analis Sistem Bisnis (Business System Analyst), Perancangan Sistem (System Designer),
+                        Programmer, dan Arsitek Aplikasi (Application Architect), (Web Developer & System Integrator).
+                    </p>
+                </div>
+
+                <!-- Role 2 -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:shadow-lg transition duration-300">
+                    <div class="w-12 h-12 bg-gold-100 rounded-lg flex items-center justify-center mb-4 text-gold-600">
+                        <i class="fas fa-tasks text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-lg text-primary-700 mb-2">2. Pengelola Sistem Informasi (P-SI.2)</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed text-justify">
+                        Peran ini diharapkan memiliki menerapkan konsep-konsep dasar dalam mengoperasikan, pengelolaan,
+                        evaluasi, serta pengembangan lanjut sistem Informasi untuk pengembangan organisasi/bisnis.
+                        Profesi Lulusan dari profil ini adalah Manajer Produk Digital, IT Service Desk Analyst, Manajer
+                        Layanan IT, IT Operation Supervisor, IT Service Analyst, Business Analyst, Data Entry
+                        Supervisor, e-Commerce Specialist, Help Desk Analyst, ICT Operation Support.
+                    </p>
+                </div>
+
+                <!-- Role 3 -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:shadow-lg transition duration-300">
+                    <div
+                        class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4 text-primary-600">
+                        <i class="fas fa-database text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-lg text-primary-700 mb-2">3. Spesialis Basis Data dan Data Saint (P-SI.3)
+                    </h4>
+                    <p class="text-gray-600 text-sm leading-relaxed text-justify">
+                        Peran lulusan yang mencakup perancang, pembangun, perawatan (termasuk updating), hingga analisis
+                        basis data. Profesi Lulusan dari profil ini adalah Database Designer, Database Programmer,
+                        Database Administrator, Analis Data (Data Analyst), Data Warehouse Analyst, dan Business
+                        Intelligence Analyst. adalah data scientist, business intelligence analyst and data engineer.
+                    </p>
+                </div>
+
+                <!-- Role 4 -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:shadow-lg transition duration-300">
+                    <div class="w-12 h-12 bg-gold-100 rounded-lg flex items-center justify-center mb-4 text-gold-600">
+                        <i class="fas fa-shield-alt text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-lg text-primary-700 mb-2">4. Tata Kelola Sistem Informasi (P-SI.4)</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed text-justify">
+                        Peran ini diharapkan memiliki kemampuan menerapkan konsep dasar dalam mengevaluasi dan mendesain
+                        tata kelola sistem informasi sesuai dengan pedoman tata kelola IT/IS dalam rangka penyelarasan
+                        IT dan bisnis/organisasi. Profesi dari profil ini adalah Auditor IT/IS, Government Information
+                        Officer, Disaster Recovery Staff, Key Performance Indicator Analyst.
+                    </p>
+                </div>
+
+                <!-- Role 5 -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:shadow-lg transition duration-300">
+                    <div
+                        class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4 text-primary-600">
+                        <i class="fas fa-rocket text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-lg text-primary-700 mb-2">5. Kewirausahaan (Entrepneurship) (P-SI.5)</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed text-justify">
+                        Peran ini, mahasiswa diharapkan sebagai agen perubahan dan pelopor bisnis digital yang dapat
+                        melahirkan wirausahawan baru dan meningkatkan jumlah wirausaha di kalangan masyarakat.
+                        Peningkatan jumlah wirausaha diharapkan akan meningkatkan jumlah lapangan kerja dan mengurangi
+                        jumlah pengangguran.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition p-6">
+                <div class="flex items-center space-x-4">
+                    <div
+                        class="flex-shrink-0 w-10 h-10 bg-primary-50 rounded-lg flex items-center justify-center text-primary-600">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="flex-1 truncate">
+                        <h3 class="font-semibold text-gray-900 truncate">Kurikulum Berbasis OBE/KKNI/SKKNI &amp; APTIKOM</h3>
+                        <p class="text-xs text-gray-500">01 Feb 2026</p>
+                    </div>
+                    <a href="/download/1/" class="text-primary-600 hover:text-primary-700">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>
+</section>
+
+<!-- Kurikulum KKNI K17 -->
+<section id="kurikulum-kkni-k2017" class="py-16 bg-gray-50 scroll-mt-20">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-primary-700 mb-3">Kurikulum Berbasis KKNI K2017</h2>
+            <div class="w-24 h-1 bg-gold-500 mx-auto mb-4"></div>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Kurikulum berbasis Kerangka Kualifikasi Nasional Indonesia (KKNI) versi tahun 2017.
+            </p>
+        </div>
+
+        
+    </div>
+</section>
+
+<!-- List Mata Kuliah -->
+<section id="daftar-matakuliah" class="py-16 bg-white scroll-mt-20">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-primary-700 mb-3">List Mata Kuliah dan Semester</h2>
+            <div class="w-24 h-1 bg-gold-500 mx-auto mb-4"></div>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Daftar mata kuliah Program Studi Sistem Informasi per semester.
+            </p>
+        </div>
+
+        <div class="max-w-6xl mx-auto">
+            <!-- Grid for Odd and Even Semesters -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                <!-- Column 1: Odd Semesters (1, 3, 5, 7) -->
+                <div class="space-y-4">
+                    
+                    
+                    <details
+                        class="bg-gray-50 rounded-xl border border-gray-100 group/semester overflow-hidden transition-all shadow-sm hover:shadow-md h-fit">
+                        <summary
+                            class="flex items-center justify-between p-4 cursor-pointer list-none bg-white hover:bg-gray-50 transition-all font-bold text-primary-700">
+                            <div class="flex items-center">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center mr-3 text-primary-600 group-open/semester:bg-gold-500 group-open/semester:text-white transition-all">
+                                    <i class="fas fa-graduation-cap text-sm"></i>
+                                </div>
+                                <span class="text-base">Semester 1</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full text-[10px] mr-3">
+                                    6 MK
+                                </span>
+                                <i
+                                    class="fas fa-chevron-down text-primary-400 group-open/semester:rotate-180 transition-transform text-xs"></i>
+                            </div>
+                        </summary>
+                        <div class="p-4 border-t border-gray-100 bg-white">
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-[10px]">
+                                    <thead class="bg-gray-50 text-gray-500 uppercase text-[9px] font-bold">
+                                        <tr>
+                                            <th class="px-2 py-2 rounded-l-lg">Kode</th>
+                                            <th class="px-2 py-2">Mata Kuliah</th>
+                                            <th class="px-2 py-2 text-center">SKS</th>
+                                            <th class="px-2 py-2 rounded-r-lg text-center">RPS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK1201</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Pengantar Manajemen
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">FKPN1201</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Aljabar Vektor dan Matriks
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK1302</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Sistem Dan Teknologi Informasi
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK1403</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Pemrogramman Dasar (P)
+                                                </div>
+
+                                                
+                                                <details class="group/dosen">
+                                                    <summary
+                                                        class="list-none cursor-pointer inline-flex items-center text-primary-500 hover:text-gold-600 text-[9px] font-semibold transition py-1">
+                                                        <i class="fas fa-user-tie mr-1"></i> Dosen Pengampu
+                                                        <i
+                                                            class="fas fa-caret-down ml-1 transform group-open/dosen:rotate-180 transition"></i>
+                                                    </summary>
+                                                    <div
+                                                        class="mt-1 p-2 bg-primary-50 rounded italic text-primary-800 text-[9px] border-l-2 border-primary-300">
+                                                        
+                                                        
+                                                        <span>1. Junaidi Surya</span>, 
+                                                        
+                                                        
+                                                        
+                                                        <span>M.Kom ; 
+2. Laylin Puad</span>, 
+                                                        
+                                                        
+                                                        
+                                                        <span>M.Kom;
+3. FaNachul Huda Aminuddin</span>, 
+                                                        
+                                                        
+                                                        
+                                                        <span>M.PdT</span>, 
+                                                        
+                                                        
+                                                        
+                                                        <span>S.Kom</span>
+                                                        
+                                                        
+                                                    </div>
+                                                </details>
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">4</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                
+                                                <a href="/download/2/?view=inline"
+                                                    target="_blank" class="text-primary-600 hover:text-gold-600"><i
+                                                        class="fas fa-eye"></i></a>
+                                                
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">FKKK1402</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Algorithma dan Pemrograman (P)
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">4</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">FKKK1403</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Sistem Operasi dan Arsitektur Komputer (P)
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </details>
+                    
+                    
+                    
+                    
+                    
+                    <details
+                        class="bg-gray-50 rounded-xl border border-gray-100 group/semester overflow-hidden transition-all shadow-sm hover:shadow-md h-fit">
+                        <summary
+                            class="flex items-center justify-between p-4 cursor-pointer list-none bg-white hover:bg-gray-50 transition-all font-bold text-primary-700">
+                            <div class="flex items-center">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center mr-3 text-primary-600 group-open/semester:bg-gold-500 group-open/semester:text-white transition-all">
+                                    <i class="fas fa-graduation-cap text-sm"></i>
+                                </div>
+                                <span class="text-base">Semester 3</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full text-[10px] mr-3">
+                                    8 MK
+                                </span>
+                                <i
+                                    class="fas fa-chevron-down text-primary-400 group-open/semester:rotate-180 transition-transform text-xs"></i>
+                            </div>
+                        </summary>
+                        <div class="p-4 border-t border-gray-100 bg-white">
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-[10px]">
+                                    <thead class="bg-gray-50 text-gray-500 uppercase text-[9px] font-bold">
+                                        <tr>
+                                            <th class="px-2 py-2 rounded-l-lg">Kode</th>
+                                            <th class="px-2 py-2">Mata Kuliah</th>
+                                            <th class="px-2 py-2 text-center">SKS</th>
+                                            <th class="px-2 py-2 rounded-r-lg text-center">RPS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK3305</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Sistem Informasi Manajemen
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK3306</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Manajemen Investasi Teknologi Informasi
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK3207</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Manajemen Proses Bisnis
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK3308</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Konsep Sistem Informasi
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">PK3202</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Pendidikan Pancasila
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">FKKB3304</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Manajemen &amp; Sistem Basis Data
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKB3301</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Pemrograman Berbasis Platform (P)
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">4</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIPN3306</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Bahasa Inggris II
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </details>
+                    
+                    
+                    
+                    
+                    
+                    <details
+                        class="bg-gray-50 rounded-xl border border-gray-100 group/semester overflow-hidden transition-all shadow-sm hover:shadow-md h-fit">
+                        <summary
+                            class="flex items-center justify-between p-4 cursor-pointer list-none bg-white hover:bg-gray-50 transition-all font-bold text-primary-700">
+                            <div class="flex items-center">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center mr-3 text-primary-600 group-open/semester:bg-gold-500 group-open/semester:text-white transition-all">
+                                    <i class="fas fa-graduation-cap text-sm"></i>
+                                </div>
+                                <span class="text-base">Semester 5</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full text-[10px] mr-3">
+                                    8 MK
+                                </span>
+                                <i
+                                    class="fas fa-chevron-down text-primary-400 group-open/semester:rotate-180 transition-transform text-xs"></i>
+                            </div>
+                        </summary>
+                        <div class="p-4 border-t border-gray-100 bg-white">
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-[10px]">
+                                    <thead class="bg-gray-50 text-gray-500 uppercase text-[9px] font-bold">
+                                        <tr>
+                                            <th class="px-2 py-2 rounded-l-lg">Kode</th>
+                                            <th class="px-2 py-2">Mata Kuliah</th>
+                                            <th class="px-2 py-2 text-center">SKS</th>
+                                            <th class="px-2 py-2 rounded-r-lg text-center">RPS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK5314</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Analisis dan Manajemen Jaringan (P)
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKB5304</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Audit Sistem informasi
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK5315</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Manajemen Proyek SI
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIPN5307</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Testing dan Implementasi Sistem Informasi
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">NHKK5203</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Technopreneur
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">FKKK5406</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Pemrograman berbasis Web (P)
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">4</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKB5304</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Matakuliah Pilihan 2
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKM502</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Lintas Prodi / MBKM
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">0</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </details>
+                    
+                    
+                    
+                    
+                    
+                    <details
+                        class="bg-gray-50 rounded-xl border border-gray-100 group/semester overflow-hidden transition-all shadow-sm hover:shadow-md h-fit">
+                        <summary
+                            class="flex items-center justify-between p-4 cursor-pointer list-none bg-white hover:bg-gray-50 transition-all font-bold text-primary-700">
+                            <div class="flex items-center">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center mr-3 text-primary-600 group-open/semester:bg-gold-500 group-open/semester:text-white transition-all">
+                                    <i class="fas fa-graduation-cap text-sm"></i>
+                                </div>
+                                <span class="text-base">Semester 7</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full text-[10px] mr-3">
+                                    7 MK
+                                </span>
+                                <i
+                                    class="fas fa-chevron-down text-primary-400 group-open/semester:rotate-180 transition-transform text-xs"></i>
+                            </div>
+                        </summary>
+                        <div class="p-4 border-t border-gray-100 bg-white">
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-[10px]">
+                                    <thead class="bg-gray-50 text-gray-500 uppercase text-[9px] font-bold">
+                                        <tr>
+                                            <th class="px-2 py-2 rounded-l-lg">Kode</th>
+                                            <th class="px-2 py-2">Mata Kuliah</th>
+                                            <th class="px-2 py-2 text-center">SKS</th>
+                                            <th class="px-2 py-2 rounded-r-lg text-center">RPS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">FKPB7209</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Etika Profesi
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">NHPB7404</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Kerja Praktek
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">4</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK7217</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Interpersonal Skill
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKB7210</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Interaksi Manusia dan Komputer
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKB7311</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Matakuliah Pilihan 5
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKB7314</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Matakuliah Pilihan 6
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKM704</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">MBKM / Magang Industri Dll
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">0</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </details>
+                    
+                    
+                    
+                    
+                    
+                    
+                </div>
+
+                <!-- Column 2: Even Semesters (2, 4, 6, 8) -->
+                <div class="space-y-4">
+                    
+                    
+                    
+                    
+                    <details
+                        class="bg-gray-50 rounded-xl border border-gray-100 group/semester overflow-hidden transition-all shadow-sm hover:shadow-md h-fit">
+                        <summary
+                            class="flex items-center justify-between p-4 cursor-pointer list-none bg-white hover:bg-gray-50 transition-all font-bold text-primary-700">
+                            <div class="flex items-center">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center mr-3 text-primary-600 group-open/semester:bg-gold-500 group-open/semester:text-white transition-all">
+                                    <i class="fas fa-graduation-cap text-sm"></i>
+                                </div>
+                                <span class="text-base">Semester 2</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full text-[10px] mr-3">
+                                    8 MK
+                                </span>
+                                <i
+                                    class="fas fa-chevron-down text-primary-400 group-open/semester:rotate-180 transition-transform text-xs"></i>
+                            </div>
+                        </summary>
+                        <div class="p-4 border-t border-gray-100 bg-white">
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-[10px]">
+                                    <thead class="bg-gray-50 text-gray-500 uppercase text-[9px] font-bold">
+                                        <tr>
+                                            <th class="px-2 py-2 rounded-l-lg">Kode</th>
+                                            <th class="px-2 py-2">Mata Kuliah</th>
+                                            <th class="px-2 py-2 text-center">SKS</th>
+                                            <th class="px-2 py-2 rounded-r-lg text-center">RPS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIPN2202</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Pengantar Akuntansi
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">PK2201</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Pendidikan Agama
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">NHPN2303</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Statistika dan Penerapan
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIPN2204</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Bahasa Inggris I
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">PK2204</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Bahasa Indonesia
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIPN2205</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Matematika Komputasi
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK2304</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Algoritma dan Pemrograman (P II)
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">NHKK2302</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Aplikasi Perkantoran (P)
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </details>
+                    
+                    
+                    
+                    
+                    
+                    <details
+                        class="bg-gray-50 rounded-xl border border-gray-100 group/semester overflow-hidden transition-all shadow-sm hover:shadow-md h-fit">
+                        <summary
+                            class="flex items-center justify-between p-4 cursor-pointer list-none bg-white hover:bg-gray-50 transition-all font-bold text-primary-700">
+                            <div class="flex items-center">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center mr-3 text-primary-600 group-open/semester:bg-gold-500 group-open/semester:text-white transition-all">
+                                    <i class="fas fa-graduation-cap text-sm"></i>
+                                </div>
+                                <span class="text-base">Semester 4</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full text-[10px] mr-3">
+                                    9 MK
+                                </span>
+                                <i
+                                    class="fas fa-chevron-down text-primary-400 group-open/semester:rotate-180 transition-transform text-xs"></i>
+                            </div>
+                        </summary>
+                        <div class="p-4 border-t border-gray-100 bg-white">
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-[10px]">
+                                    <thead class="bg-gray-50 text-gray-500 uppercase text-[9px] font-bold">
+                                        <tr>
+                                            <th class="px-2 py-2 rounded-l-lg">Kode</th>
+                                            <th class="px-2 py-2">Mata Kuliah</th>
+                                            <th class="px-2 py-2 text-center">SKS</th>
+                                            <th class="px-2 py-2 rounded-r-lg text-center">RPS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKB3302</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Teknologi Basis Data
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK4309</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Analisis dan Perancangan Sistem Informasi
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">FKKK4305</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Komunikasi Data dan Jaringan Komputer (P)
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK4311</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Tata Kelola Teknologi Informasi
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK4312</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Manajemen Sains
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">PK4203</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Pendidikan Kewarganegaraan
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK4213</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Arsitektur SI/IT Perusahaan
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKB4303</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Matakuliah Pilihan 1
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKM401</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Lintas Prodi / MBKM
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">0</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </details>
+                    
+                    
+                    
+                    
+                    
+                    <details
+                        class="bg-gray-50 rounded-xl border border-gray-100 group/semester overflow-hidden transition-all shadow-sm hover:shadow-md h-fit">
+                        <summary
+                            class="flex items-center justify-between p-4 cursor-pointer list-none bg-white hover:bg-gray-50 transition-all font-bold text-primary-700">
+                            <div class="flex items-center">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center mr-3 text-primary-600 group-open/semester:bg-gold-500 group-open/semester:text-white transition-all">
+                                    <i class="fas fa-graduation-cap text-sm"></i>
+                                </div>
+                                <span class="text-base">Semester 6</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full text-[10px] mr-3">
+                                    8 MK
+                                </span>
+                                <i
+                                    class="fas fa-chevron-down text-primary-400 group-open/semester:rotate-180 transition-transform text-xs"></i>
+                            </div>
+                        </summary>
+                        <div class="p-4 border-t border-gray-100 bg-white">
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-[10px]">
+                                    <thead class="bg-gray-50 text-gray-500 uppercase text-[9px] font-bold">
+                                        <tr>
+                                            <th class="px-2 py-2 rounded-l-lg">Kode</th>
+                                            <th class="px-2 py-2">Mata Kuliah</th>
+                                            <th class="px-2 py-2 text-center">SKS</th>
+                                            <th class="px-2 py-2 rounded-r-lg text-center">RPS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">FKKK6307</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Metode Penelitian
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKK6316</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Sistem Multimedia
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">FKKK6208</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Komputer dan Masyarakat
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">2</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKB6306</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Sistem Pendukung Keputusan Berbasis Model
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKB6407</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Rekayasa Web
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">4</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKB6307</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Matakuliah Pilihan 3
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">3</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKB6409</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Matakuliah Pilihan 4
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">4</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKM603</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">MBKM / Magang Industri Dll
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">0</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </details>
+                    
+                    
+                    
+                    
+                    
+                    <details
+                        class="bg-gray-50 rounded-xl border border-gray-100 group/semester overflow-hidden transition-all shadow-sm hover:shadow-md h-fit">
+                        <summary
+                            class="flex items-center justify-between p-4 cursor-pointer list-none bg-white hover:bg-gray-50 transition-all font-bold text-primary-700">
+                            <div class="flex items-center">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center mr-3 text-primary-600 group-open/semester:bg-gold-500 group-open/semester:text-white transition-all">
+                                    <i class="fas fa-graduation-cap text-sm"></i>
+                                </div>
+                                <span class="text-base">Semester 8</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full text-[10px] mr-3">
+                                    1 MK
+                                </span>
+                                <i
+                                    class="fas fa-chevron-down text-primary-400 group-open/semester:rotate-180 transition-transform text-xs"></i>
+                            </div>
+                        </summary>
+                        <div class="p-4 border-t border-gray-100 bg-white">
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-[10px]">
+                                    <thead class="bg-gray-50 text-gray-500 uppercase text-[9px] font-bold">
+                                        <tr>
+                                            <th class="px-2 py-2 rounded-l-lg">Kode</th>
+                                            <th class="px-2 py-2">Mata Kuliah</th>
+                                            <th class="px-2 py-2 text-center">SKS</th>
+                                            <th class="px-2 py-2 rounded-r-lg text-center">RPS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-2 py-3 font-mono text-primary-600 font-bold align-top pt-3">SIKB8613</td>
+                                            <td class="px-2 py-3 align-top pt-3">
+                                                <div class="font-bold text-gray-900 leading-tight mb-2">Skripsi
+                                                </div>
+
+                                                
+                                            </td>
+                                            <td class="px-2 py-3 text-center text-gray-700 font-bold align-top pt-3">6</td>
+                                            <td class="px-2 py-3 text-center align-top pt-3">
+                                                <span class="text-gray-200"><i
+                                                        class="fas fa-eye"></i></span>
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </details>
+                    
+                    
+                    
+                    
+                </div>
+            </div>
+
+            <!-- Elective courses at the bottom -->
+            <div class="mt-8">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <details
+                    class="bg-white rounded-xl border-2 border-primary-100 group/semester overflow-hidden transition-all shadow-sm hover:shadow-md">
+                    <summary
+                        class="flex items-center justify-between p-5 cursor-pointer list-none bg-primary-50 hover:bg-primary-100 transition-all font-bold text-primary-700">
+                        <div class="flex items-center">
+                            <div
+                                class="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center mr-4 text-white">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-lg">Mata Kuliah Pilihan</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span
+                                class="bg-white text-primary-700 px-3 py-1 rounded-full text-xs mr-4 font-bold border border-primary-200">
+                                14 MK Pilihan
+                            </span>
+                            <i
+                                class="fas fa-chevron-down text-primary-600 group-open/semester:rotate-180 transition-transform"></i>
+                        </div>
+                    </summary>
+                    <div class="p-6 border-t border-primary-100 bg-white">
+                        
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB4301</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">3 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Sistem Informasi Akuntansi</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB4302</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">3 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Sistem Informasi Perbankan</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB4303</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">3 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Konsep Data Mining</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB5304</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">3 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Grafika Komputer &amp; Pengolahan Citra</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB5305</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">3 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Bisnis Digital</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB5306</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">3 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Pengantar Model &amp; Simulasi</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB6307</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">3 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Rekayasa Perangkat Lunak</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB6308</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">3 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Sistem Terdistribusi</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB6409</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">4 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Pemrograman Berorientasi Objek</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB6410</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">4 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Pemrograman Mobile</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB7311</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">3 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Keamanan Sistem Informasi (P)</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB7312</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">3 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Pemasaran Digital</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB7313</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">3 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Pengantar Digital Forensic IT</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                            <div
+                                class="p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-white hover:shadow-sm transition group/card">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span
+                                        class="text-[10px] font-mono text-primary-600 font-bold bg-white px-2 py-0.5 rounded border border-primary-100">SIKB7314</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-200 px-2 py-0.5 rounded">3 SKS</span>
+                                </div>
+                                <h4
+                                    class="font-bold text-gray-900 text-sm leading-tight group-hover/card:text-primary-700 transition mb-2">
+                                    Sistem Cerdas</h4>
+
+                                
+
+                                <div class="flex justify-end">
+                                    
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                    </div>
+                </details>
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- RPS Section -->
+<section id="rps" class="py-16 bg-gray-50 scroll-mt-20">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-primary-700 mb-3">Rencana Pembelajaran Semester (RPS)</h2>
+            <div class="w-24 h-1 bg-gold-500 mx-auto mb-4"></div>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Dokumen rencana pembelajaran rinci untuk setiap mata kuliah yang diajarkan.
+            </p>
+        </div>
+
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition p-5 group">
+                <div class="text-center">
+                    <div
+                        class="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition duration-300">
+                        <i class="fas fa-file-contract text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-900 mb-1 text-sm line-clamp-2 h-10">RPS Pemrograman Dasar [4 SKS]</h3>
+                    <p class="text-xs text-gray-500 mb-4">Feb 2026</p>
+                    <a href="/download/2/"
+                        class="inline-flex items-center justify-center px-4 py-2 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-600 hover:text-white transition w-full text-xs font-bold">
+                        <i class="fas fa-download mr-2"></i> Download RPS
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>
+</section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-primary-900 text-white mt-16">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- About -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-gold-400">Program Studi Sistem Informasi</h3>
+                    <p class="text-gray-300 text-sm">
+                        Fakultas Ilmu Komputer<br>
+                        Universitas Nurdin Hamzah<br>
+                        Jambi, Indonesia
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4 text-gold-400">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/profile/" class="hover:text-gold-400 transition">Visi & Misi</a></li>
+                        <li><a href="/akademik/" class="hover:text-gold-400 transition">Dosen</a></li>
+                        <li><a href="/kurikulum/" class="hover:text-gold-400 transition">Kurikulum</a></li>
+                        <li><a href="/akreditasi/" class="hover:text-gold-400 transition">Akreditasi</a></li>
+                    </ul>
+                </div>
+
+                <!-- Services -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4 text-gold-400">Layanan</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-gold-400 transition">SIAKAD</a></li>
+                        <li><a href="#" class="hover:text-gold-400 transition">V-Class</a></li>
+                        <li><a href="#" class="hover:text-gold-400 transition">Open Journal System</a></li>
+                        <li><a href="#" class="hover:text-gold-400 transition">Laboratorium</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4 text-gold-400">Kontak</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><i class="fas fa-envelope mr-2"></i> sistem.informasi@unh.ac.id</li>
+                        <li><i class="fas fa-phone mr-2"></i> +62 xxx xxxx xxxx</li>
+                        <li><i class="fas fa-map-marker-alt mr-2"></i> Jambi, Indonesia</li>
+                    </ul>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-2xl hover:text-gold-400 transition"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-2xl hover:text-gold-400 transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-2xl hover:text-gold-400 transition"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-primary-800 mt-8 pt-6 text-center text-sm text-gray-400">
+                <p>&copy; 2025 Program Studi Sistem Informasi - Universitas Nurdin Hamzah. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function () {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Mobile submenu toggle
+        function toggleMobileSubmenu(id) {
+            const submenu = document.getElementById(id);
+            const icon = document.getElementById(id + '-icon');
+            if (submenu) {
+                submenu.classList.toggle('hidden');
+            }
+            if (icon) {
+                icon.classList.toggle('rotate-180');
+            }
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function () {
+            const nav = document.querySelector('.navbar-scroll');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-2xl');
+            } else {
+                nav.classList.remove('shadow-2xl');
+            }
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const targetId = this.getAttribute('href').split('#')[1];
+                if (targetId) {
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        e.preventDefault();
+                        const navHeight = document.querySelector('nav').offsetHeight;
+                        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navHeight;
+
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+
+                        // For mobile menu, close it after clicking
+                        if (window.innerWidth < 1024) {
+                            const menu = document.getElementById('mobile-menu');
+                            if (menu) menu.classList.add('hidden');
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+    
+</body>
+
+</html>

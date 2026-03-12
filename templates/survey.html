@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+{% block title %}Survei Pemahaman VMTS - SI UNH{% endblock %}
+
+{% block content %}
+<section class="gradient-purple-gold text-white py-16">
+    <div class="container mx-auto px-4 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Survei Pemahaman VMTS</h1>
+        <p class="text-xl text-gold-200">Kuesioner Evaluasi Visi, Misi, Tujuan, dan Sasaran Program Studi Sistem
+            Informasi</p>
+    </div>
+</section>
+
+<section class="py-12 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+                <div class="bg-primary-700 text-white p-6">
+                    <h2 class="text-2xl font-bold mb-2">Instruksi Pengisian</h2>
+                    <p class="text-primary-100">Mohon jawablah pertanyaan-pertanyaan berikut dengan jujur sesuai dengan
+                        pengetahuan dan pemahaman Anda saat ini. Partisipasi Anda sangat berarti bagi pengembangan
+                        Program Studi Sistem Informasi Universitas Nurdin Hamzah.</p>
+                </div>
+
+                <form method="post" class="p-8 space-y-8">
+                    {% csrf_token %}
+
+                    <!-- A. Identitas Responden -->
+                    <div>
+                        <h3 class="text-xl font-bold text-primary-800 border-b-2 border-gold-400 pb-2 mb-4">A. Identitas
+                            Responden</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">1. Status Anda saat ini: <span
+                                        class="text-red-500">*</span></label>
+                                <select name="status"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+                                    required>
+                                    <option value="" disabled selected>Pilih Status</option>
+                                    <option value="pimpinan">Pimpinan/Prodi</option>
+                                    <option value="karyawan">Karyawan</option>
+                                    <option value="stakeholder">Stakeholder</option>
+                                    <option value="dosen">Dosen/Tenaga Pengajar</option>
+                                    <option value="alumni">Alumni</option>
+                                    <option value="mahasiswa">Mahasiswa/Mahasiswi</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">2. Berapa lama Anda telah
+                                    bergabung di Program Studi ini? <span class="text-red-500">*</span></label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="lama" value="<1 Tahun"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500" required>
+                                        <span>
+                                            < 1 Tahun</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="lama" value="1-5 Tahun"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>1 - 5 Tahun</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="lama" value="6-10 Tahun"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>6 - 10 Tahun</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="lama" value=">10 Tahun"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>> 10 Tahun</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- B. Sosialisasi Visi dan Misi -->
+                    <div>
+                        <h3 class="text-xl font-bold text-primary-800 border-b-2 border-gold-400 pb-2 mb-4">B.
+                            Sosialisasi Visi dan Misi</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">3. Apakah Anda mengetahui Visi dan
+                                    Misi Program Studi Sistem Informasi? <span class="text-red-500">*</span></label>
+                                <div class="flex space-x-6">
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="pengetahuan_visi" value="Tahu"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500" required>
+                                        <span>Tahu</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="pengetahuan_visi" value="Tidak Tahu"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>Tidak Tahu</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">4. Dari mana Anda mengetahui Visi
+                                    dan Misi? (Pilihan boleh lebih dari satu)</label>
+                                <div class="grid md:grid-cols-2 gap-3">
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="checkbox" name="sumber" value="Situs Web"
+                                            class="w-5 h-5 rounded text-primary-600 focus:ring-primary-500">
+                                        <span>Situs Web Program Studi</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="checkbox" name="sumber" value="Banners/Posters"
+                                            class="w-5 h-5 rounded text-primary-600 focus:ring-primary-500">
+                                        <span>Banners/Posters/Billboard di Kampus</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="checkbox" name="sumber" value="Sosialisasi Pimpinan"
+                                            class="w-5 h-5 rounded text-primary-600 focus:ring-primary-500">
+                                        <span>Sosialisasi Pimpinan/Dosen</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="checkbox" name="sumber" value="Buku Panduan"
+                                            class="w-5 h-5 rounded text-primary-600 focus:ring-primary-500">
+                                        <span>Buku Panduan Akademik</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="checkbox" name="sumber" value="Media Sosial"
+                                            class="w-5 h-5 rounded text-primary-600 focus:ring-primary-500">
+                                        <span>Media Sosial (IG, FB, dll)</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">5. Seberapa sering
+                                    Bapak/Ibu/Saudara/i mendapatkan sosialisasi tentang VMTS? <span
+                                        class="text-red-500">*</span></label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="frekuensi" value="Sangat Sering"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500" required>
+                                        <span>Sangat Sering</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="frekuensi" value="Sering"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>Sering</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="frekuensi" value="Cukup"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>Cukup</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="frekuensi" value="Jarang"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>Jarang</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- C. Pemahaman & Analisis -->
+                    <div>
+                        <h3 class="text-xl font-bold text-primary-800 border-b-2 border-gold-400 pb-2 mb-4">C. Pemahaman
+                            & Analisis</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">6. Sejauh mana tingkat pemahaman
+                                    Anda terhadap Visi dan Misi Program Studi? <span
+                                        class="text-red-500">*</span></label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="tingkat_paham" value="Sangat Paham"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500" required>
+                                        <span>Sangat Paham (Dapat menjelaskan kembali dengan detail)</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="tingkat_paham" value="Paham"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>Paham (Mengerti poin-poin utamanya)</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="tingkat_paham" value="Cukup Paham"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>Cukup Paham</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="tingkat_paham" value="Kurang Paham"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>Kurang Paham</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">7. Menurut Bapak/Ibu/Saudara/i
+                                    aspeks mana saja yang paling tercermin dalam implementasi Visi dan Misi? <span
+                                        class="text-red-500">*</span></label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="aspek_tercermin" value="Pendidikan"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500" required>
+                                        <span>Kualitas Pendidikan & Pengajaran</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="aspek_tercermin" value="Penelitian"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>Pengembangan Penelitian</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="aspek_tercermin" value="Pengabdian"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>Pengabdian Masyarakat</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="aspek_tercermin" value="Layanan"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>Peningkatan Layanan Akademik</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">8. Bidang Keunggulan apa yang
+                                    tercermin dalam VMTS Program Studi? (Pilihan boleh lebih dari satu)</label>
+                                <div class="grid md:grid-cols-2 gap-3">
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="checkbox" name="bidang" value="Teknologi Informasi"
+                                            class="w-5 h-5 rounded text-primary-600 focus:ring-primary-500">
+                                        <span>Teknologi Informasi</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="checkbox" name="bidang" value="Kewirausahaan"
+                                            class="w-5 h-5 rounded text-primary-600 focus:ring-primary-500">
+                                        <span>Kewirausahaan / Entrepreneurship</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="checkbox" name="bidang" value="Etika Profesi"
+                                            class="w-5 h-5 rounded text-primary-600 focus:ring-primary-500">
+                                        <span>Etika & Karakter (Akhlak Mulia)</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="checkbox" name="bidang" value="Industri Digital"
+                                            class="w-5 h-5 rounded text-primary-600 focus:ring-primary-500">
+                                        <span>Relevansi Industri Digital</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">9. Apakah kegiatan akademik dan
+                                    non-akademik di Program Studi telah mendukung terciptanya atmosfer akademik yang
+                                    sesuai dengan Visi? <span class="text-red-500">*</span></label>
+                                <div class="flex space-x-6">
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="dukungan_atmosfer" value="Ya"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500" required>
+                                        <span>Ya</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="dukungan_atmosfer" value="Tidak"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>Tidak</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="dukungan_atmosfer" value="Sebagian"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>Sebagian</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">10. Menurut Anda, apakah Visi dan
+                                    Misi Program Studi saat ini perlu dilakukan perbaikan? <span
+                                        class="text-red-500">*</span></label>
+                                <div class="flex space-x-6">
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="perlu_perbaikan" value="Ya"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500" required>
+                                        <span>Ya</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 text-gray-700 cursor-pointer">
+                                        <input type="radio" name="perlu_perbaikan" value="Tidak"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                                        <span>Tidak</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- D. Kritik dan Saran -->
+                    <div>
+                        <h3 class="text-xl font-bold text-primary-800 border-b-2 border-gold-400 pb-2 mb-4">D. Kritik
+                            dan Saran</h3>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">11. Berikan saran atau masukan untuk
+                                pengembangan Program Studi Sistem Informasi ke depan:</label>
+                            <textarea name="saran" rows="4"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+                                placeholder="Masukkan saran Anda di sini..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="pt-6">
+                        <button type="submit"
+                            class="w-full bg-gradient-to-r from-primary-600 to-primary-800 hover:from-primary-700 hover:to-primary-900 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300">
+                            Kirim Respon Survei
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <p class="text-center text-gray-500 mt-8 text-sm">
+                &copy; 2026 Program Studi Sistem Informasi - Universitas Nurdin Hamzah
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

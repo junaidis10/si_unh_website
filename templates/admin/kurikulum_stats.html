@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% block title %}Statistik Survei Kurikulum - Admin{% endblock %}
+
+{% block content %}
+<section class="gradient-purple-gold text-white py-12">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+        <div>
+            <h1 class="text-4xl font-bold mb-2">Statistik Survei Kurikulum</h1>
+            <p class="text-gold-200">Analisis Instrumen Alumni, Pengguna, Pakar & Stakeholder</p>
+        </div>
+        <div class="flex space-x-4">
+            <a href="{% url 'admin_dashboard' %}"
+                class="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-lg font-bold flex items-center transition">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="py-12 bg-gray-50">
+    <div class="container mx-auto px-4">
+        {% if empty %}
+        <div class="bg-white rounded-xl shadow p-12 text-center">
+            <i class="fas fa-chart-bar text-6xl text-gray-300 mb-4"></i>
+            <h2 class="text-2xl font-bold text-gray-600">Belum ada data survei</h2>
+            <p class="text-gray-500 mt-2">Data statistik akan muncul setelah ada responden yang mengisi survei.</p>
+        </div>
+        {% else %}
+        <!-- Summary Cards -->
+        <div class="grid md:grid-cols-4 gap-6 mb-12">
+            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-500">
+                <p class="text-gray-500 text-sm font-bold uppercase">Total Responden</p>
+                <p class="text-3xl font-black text-blue-800">{{ total_responden }}</p>
+            </div>
+            {% for cat in category_counts %}
+            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-orange-500">
+                <p class="text-gray-500 text-sm font-bold uppercase">{{ cat.kategori_responden|capfirst }}</p>
+                <p class="text-3xl font-black text-orange-800">{{ cat.total }}</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="grid md:grid-cols-1 gap-8">
+            <!-- Alumni Competency Barchart -->
+            {% if alumni_stats %}
+            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Rata-rata Kompetensi Alumni (CPL)</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <canvas id="alumniChart" height="300"></canvas>
+                    </div>
+                    <div>
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="bg-gray-100 font-bold border-b">
+                                    <th class="p-3">Aspek CPL</th>
+                                    <th class="p-3 text-center">Skor</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in alumni_stats %}
+                                <tr class="border-b hover:bg-gray-50 transition">
+                                    <td class="p-3 font-semibold text-gray-700">{{ item.label }}</td>
+                                    <td class="p-3">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="flex-1 bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                                                <div class="h-2.5 rounded-full {% if item.value >= 3.5 %}bg-green-500{% elif item.value >= 2.5 %}bg-blue-500{% elif item.value >= 1.5 %}bg-yellow-500{% else %}bg-red-500{% endif %}" style="width: calc({{ item.value }} / 4 * 100%)"></div>
+                                            </div>
+                                            <span class="w-10 text-right font-bold text-gray-700">{{ item.value }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-3">
+                                        {% if item.value >= 3.5 %}<span class="text-green-600 font-bold"><i
+                                                class="fas fa-check-circle mr-1"></i> Sangat Baik</span>
+                                        {% elif item.value >= 2.5 %}<span class="text-blue-600 font-bold"><i
+                                                class="fas fa-check-circle mr-1"></i> Baik</span>
+                                        {% elif item.value >= 1.5 %}<span class="text-yellow-600 font-bold"><i
+                                                class="fas fa-exclamation-circle mr-1"></i> Cukup</span>
+                                        {% else %}<span class="text-red-600 font-bold"><i
+                                                class="fas fa-times-circle mr-1"></i> Kurang</span>{% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- User Satisfaction Barchart -->
+            {% if user_stats %}
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Kepuasan Pengguna Lulusan (Industri)</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <canvas id="userChart" height="250"></canvas>
+                    </div>
+                    <div>
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="bg-gray-100 font-bold border-b">
+                                    <th class="p-3">Aspek Penilaian</th>
+                                    <th class="p-3 text-center">Skor</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in user_stats %}
+                                <tr class="border-b hover:bg-gray-50 transition">
+                                    <td class="p-3 font-semibold text-gray-700">{{ item.label }}</td>
+                                    <td class="p-3">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="flex-1 bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                                                <div class="h-2.5 rounded-full {% if item.value >= 3.5 %}bg-green-500{% elif item.value >= 2.5 %}bg-blue-500{% elif item.value >= 1.5 %}bg-yellow-500{% else %}bg-red-500{% endif %}" style="width: calc({{ item.value }} / 4 * 100%)"></div>
+                                            </div>
+                                            <span class="w-10 text-right font-bold text-gray-700">{{ item.value }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-3">
+                                        {% if item.value >= 3.5 %}<span class="text-green-600 font-bold">Sangat
+                                            Baik</span>
+                                        {% elif item.value >= 2.5 %}<span class="text-blue-600 font-bold">Baik</span>
+                                        {% elif item.value >= 1.5 %}<span class="text-yellow-600 font-bold">Cukup</span>
+                                        {% else %}<span class="text-red-600 font-bold">Kurang</span>{% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+{% if alumni_stats %}
+const ctxAlumni = document.getElementById('alumniChart').getContext('2d');
+new Chart(ctxAlumni, {
+    type: 'bar',
+    data: {
+        labels: [{% for item in alumni_stats %}"{{ item.label|escapejs }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Skor Rata-rata CPL',
+            data: [{% for item in alumni_stats %}{{ item.value|stringformat:"f" }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+            backgroundColor: 'rgba(59, 130, 246, 0.6)',
+            borderColor: 'rgb(59, 130, 246)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                beginAtZero: true,
+                max: 4,
+                ticks: { stepSize: 1 }
+            }
+        },
+        plugins: {
+            legend: { display: false }
+        }
+    }
+});
+{% endif %}
+
+{% if user_stats %}
+const ctxUser = document.getElementById('userChart').getContext('2d');
+new Chart(ctxUser, {
+    type: 'bar',
+    data: {
+        labels: [{% for item in user_stats %}"{{ item.label|escapejs }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Skor Rata-rata Kepuasan',
+            data: [{% for item in user_stats %}{{ item.value|stringformat:"f" }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+            backgroundColor: 'rgba(16, 185, 129, 0.6)',
+            borderColor: 'rgb(16, 185, 129)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                beginAtZero: true,
+                max: 4,
+                ticks: { stepSize: 1 }
+            }
+        },
+        plugins: {
+            legend: { display: false }
+        }
+    }
+});
+{% endif %}
+</script>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}{{ category.name }} - SI UNH{% endblock %}
+{% block content %}
+<section class="gradient-purple-gold text-white py-16">
+    <div class="container mx-auto px-4 text-center">
+        <h1 class="text-5xl font-bold mb-4">{{ category.name }}</h1>
+        <p class="text-xl text-gold-200">{{ category.description }}</p>
+    </div>
+</section>
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for doc in documents %}
+            <div class="bg-white border-2 border-gray-200 rounded-lg shadow hover:shadow-xl transition p-6">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-file-pdf text-red-600 text-4xl"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-primary-800 mb-2">{{ doc.title }}</h3>
+                        {% if doc.description %}
+                        <p class="text-sm text-gray-600 mb-4">{{ doc.description }}</p>
+                        {% endif %}
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500">{{ doc.uploaded_at|date:"d M Y" }}</span>
+                            <a href="{% url 'download_document' doc.id %}" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm transition">
+                                <i class="fas fa-download mr-1"></i> Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center text-gray-500 py-12">
+                Belum ada dokumen tersedia
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

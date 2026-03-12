@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Survei Berhasil - SI UNH{% endblock %}
+
+{% block content %}
+<section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4 text-center">
+        <div class="max-w-2xl mx-auto bg-white p-12 rounded-2xl shadow-xl">
+            <div
+                class="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-check text-4xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Terima Kasih!</h1>
+            <p class="text-xl text-gray-600 mb-8">Respon survei Anda telah berhasil kami simpan. Kontribusi Anda sangat
+                berharga bagi peningkatan mutu Program Studi Sistem Informasi Universitas Nurdin Hamzah.</p>
+            <a href="{% url 'layanan' %}"
+                class="inline-block bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-md">
+                Kembali ke Layanan
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
