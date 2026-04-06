@@ -70,7 +70,7 @@ def profile(request):
 
 def akademik(request):
     """Halaman Akademik"""
-    dosen_tetap = Dosen.objects.prefetch_related('mata_kuliah_diampu').filter(kategori__in=['tetap', 'dtpr'], is_active=True)
+    dosen_tetap = Dosen.objects.prefetch_related('mata_kuliah_diampu').filter(kategori='tetap', is_active=True)
     dosen_lb = Dosen.objects.prefetch_related('mata_kuliah_diampu').filter(kategori='luar_biasa', is_active=True)
     
     context = {
