@@ -13,7 +13,6 @@ build/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-/media
 /staticfiles
 /static
 
@@ -36,5 +35,5 @@ ENV/
 Thumbs.db
 
 # Uploads
-media/
-uploads/
+# media/
+# uploads/
