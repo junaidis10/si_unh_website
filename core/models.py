@@ -70,12 +70,13 @@ class Dosen(models.Model):
     """Data Dosen"""
     KATEGORI_CHOICES = [
         ('tetap', 'Dosen Tetap'),
+        ('dtpr', 'Dosen Tetap Pembagi Rasio'),
         ('luar_biasa', 'Dosen Luar Biasa'),
     ]
     
     nidn = models.CharField(max_length=20, unique=True)
     nama = models.CharField(max_length=100)
-    kategori = models.CharField(max_length=20, choices=KATEGORI_CHOICES, default='tetap')
+    kategori = models.CharField(max_length=28, choices=KATEGORI_CHOICES, default='tetap')
     photo = models.ImageField(upload_to='dosen/', blank=True)
     email = models.EmailField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
