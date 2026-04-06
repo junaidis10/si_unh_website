@@ -157,10 +157,10 @@ class PageContentAdmin(admin.ModelAdmin):
     search_fields = ['page_name', 'title', 'content']
 @admin.register(MataKuliah)
 class MataKuliahAdmin(admin.ModelAdmin):
-    list_display = ['kode', 'nama', 'semester', 'sks', 'rps_link_status', 'dosen_count', 'order', 'is_active']
+    list_display = ['kode', 'nama', 'semester', 'sks', 'is_active']
     list_filter = ['semester', 'kategori', 'is_active']
     search_fields = ['kode', 'nama', 'dosen_pengampu__nama']
-    list_editable = ['order', 'is_active']
+    list_editable = ['is_active']
     filter_horizontal = ('dosen_pengampu',)
     
     fieldsets = [
@@ -245,3 +245,19 @@ class SurveyKurikulumAdmin(admin.ModelAdmin):
             'fields': ('responses_data', 'created_at')
         }),
     )
+
+@admin.register(JadwalKuliah)
+class JadwalKuliahAdmin(admin.ModelAdmin):
+    list_display = ['mata_kuliah', 'kelas', 'hari', 'jam_mulai', 'jam_selesai', 'ruangan', 'is_active']
+    list_filter = ['hari', 'is_active', 'mata_kuliah__semester']
+    search_fields = ['mata_kuliah__nama', 'kelas', 'ruangan']
+    list_editable = ['is_active', 'ruangan', 'hari', 'jam_mulai', 'jam_selesai']
+    filter_horizontal = ('dosen_pengampu',)
+
+
+@admin.register(JadwalPerkuliahanItem)
+class JadwalPerkuliahanItemAdmin(admin.ModelAdmin):
+    list_display = ['semester', 'kode_mk', 'nama_mk', 'sks', 'jadwal', 'ruangan', 'dosen', 'batch_label', 'is_active']
+    list_filter = ['semester', 'is_active', 'batch_label']
+    search_fields = ['kode_mk', 'nama_mk', 'dosen', 'jadwal', 'ruangan']
+    list_editable = ['is_active', 'jadwal', 'ruangan']

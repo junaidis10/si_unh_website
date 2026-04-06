@@ -375,7 +375,7 @@ class MataKuliah(models.Model):
     dosen_pengampu_legacy = models.TextField(blank=True, help_text="Data lama dosen pengampu (text)")
     dosen_pengampu = models.ManyToManyField('Dosen', blank=True, related_name='mata_kuliah_diampu', help_text="Pilih dosen pengampu dari data dosen yang ada")
     materi_perkuliahan = models.TextField(blank=True, help_text="Ringkasan materi perkuliahan")
-    
+
     order = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
     
@@ -492,3 +492,52 @@ class SurveyKurikulum(models.Model):
 
     def __str__(self):
         return f'{self.get_kategori_responden_display()} - {self.nama_responden}'
+
+class JadwalKuliah(models.Model):
+    HARI_CHOICES = [
+        ('Senin', 'Senin'),
+        ('Selasa', 'Selasa'),
+        ('Rabu', 'Rabu'),
+        ('Kamis', 'Kamis'),
+        ('Jumat', 'Jumat'),
+        ('Sabtu', 'Sabtu'),
+    ]
+    
+    mata_kuliah = models.ForeignKey(MataKuliah, on_delete=models.CASCADE, related_name='jadwal', help_text="Pilih Mata Kuliah")
+    hari = models.CharField(max_length=20, choices=HARI_CHOICES)
+    jam_mulai = models.TimeField()
+    jam_selesai = models.TimeField()
+    ruangan = models.CharField(max_length=50)
+    kelas = models.CharField(max_length=50, blank=True, help_text="Contoh: SI-1, Reguler A")
+    dosen_pengampu = models.ManyToManyField(Dosen, blank=True, related_name='jadwal_diampu')
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = 'Jadwal Kuliah'
+        ordering = ['hari', 'jam_mulai']
+
+    def __str__(self):
+        return f'{self.mata_kuliah.nama} ({self.kelas}) - {self.hari}'
+
+
+class JadwalPerkuliahanItem(models.Model):
+    """Data jadwal perkuliahan yang diimpor murni dari file Excel"""
+    semester = models.CharField(max_length=50, help_text="Contoh: Ganjil, Genap, atau 1, 2")
+    kode_mk = models.CharField(max_length=30, verbose_name="Kode MK")
+    nama_mk = models.CharField(max_length=300, verbose_name="Nama Mata Kuliah")
+    sks = models.IntegerField(verbose_name="SKS")
+    jadwal = models.CharField(max_length=300, blank=True, verbose_name="Jadwal Perkuliahan", help_text="Contoh: Senin 08:00-10:00")
+    ruangan = models.CharField(max_length=100, blank=True, verbose_name="Ruangan", help_text="Contoh: R.Lab1")
+    dosen = models.CharField(max_length=500, blank=True, verbose_name="Dosen Pengampu")
+    kode_dosen = models.CharField(max_length=50, blank=True, verbose_name="Kode Dosen / NIDN")
+    is_active = models.BooleanField(default=True)
+    batch_label = models.CharField(max_length=100, blank=True, help_text="Label batch import, contoh: Genap 2025/2026")
+    imported_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = 'Jadwal Perkuliahan Items'
+        ordering = ['semester', 'kode_mk']
+
+    def __str__(self):
+        return f'{self.kode_mk} - {self.nama_mk} ({self.dosen})'

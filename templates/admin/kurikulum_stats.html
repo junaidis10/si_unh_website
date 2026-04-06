@@ -65,9 +65,11 @@
                                     <td class="p-3">
                                         <div class="flex items-center space-x-3">
                                             <div class="flex-1 bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                                                <div class="h-2.5 rounded-full {% if item.value >= 3.5 %}bg-green-500{% elif item.value >= 2.5 %}bg-blue-500{% elif item.value >= 1.5 %}bg-yellow-500{% else %}bg-red-500{% endif %}" style="width: calc({{ item.value }} / 4 * 100%)"></div>
+                                                <div class="progress-bar-fill h-2.5 rounded-full {% if item.value >= 3.5 %}bg-green-500{% elif item.value >= 2.5 %}bg-blue-500{% elif item.value >= 1.5 %}bg-yellow-500{% else %}bg-red-500{% endif %}"
+                                                    data-width="{% widthratio item.value 4 100 %}"></div>
                                             </div>
-                                            <span class="w-10 text-right font-bold text-gray-700">{{ item.value }}</span>
+                                            <span class="w-10 text-right font-bold text-gray-700">{{ item.value
+                                                }}</span>
                                         </div>
                                     </td>
                                     <td class="p-3">
@@ -113,9 +115,11 @@
                                     <td class="p-3">
                                         <div class="flex items-center space-x-3">
                                             <div class="flex-1 bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                                                <div class="h-2.5 rounded-full {% if item.value >= 3.5 %}bg-green-500{% elif item.value >= 2.5 %}bg-blue-500{% elif item.value >= 1.5 %}bg-yellow-500{% else %}bg-red-500{% endif %}" style="width: calc({{ item.value }} / 4 * 100%)"></div>
+                                                <div class="progress-bar-fill h-2.5 rounded-full {% if item.value >= 3.5 %}bg-green-500{% elif item.value >= 2.5 %}bg-blue-500{% elif item.value >= 1.5 %}bg-yellow-500{% else %}bg-red-500{% endif %}"
+                                                    data-width="{% widthratio item.value 4 100 %}"></div>
                                             </div>
-                                            <span class="w-10 text-right font-bold text-gray-700">{{ item.value }}</span>
+                                            <span class="w-10 text-right font-bold text-gray-700">{{ item.value
+                                                }}</span>
                                         </div>
                                     </td>
                                     <td class="p-3">
@@ -142,69 +146,104 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
+
 {% if alumni_stats %}
-const ctxAlumni = document.getElementById('alumniChart').getContext('2d');
-new Chart(ctxAlumni, {
-    type: 'bar',
-    data: {
-        labels: [{% for item in alumni_stats %}"{{ item.label|escapejs }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
-        datasets: [{
-            label: 'Skor Rata-rata CPL',
-            data: [{% for item in alumni_stats %}{{ item.value|stringformat:"f" }}{% if not forloop.last %}, {% endif %}{% endfor %}],
-            backgroundColor: 'rgba(59, 130, 246, 0.6)',
-            borderColor: 'rgb(59, 130, 246)',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            x: {
-                beginAtZero: true,
-                max: 4,
-                ticks: { stepSize: 1 }
-            }
-        },
-        plugins: {
-            legend: { display: false }
-        }
-    }
-});
+<script type="application/json" id="alumni-data">
+[
+    {% for item in alumni_stats %}
+    { "label": "{{ item.label|escapejs }}", "value": {{ item.value|stringformat:"f" }} }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+]
+</script>
 {% endif %}
 
 {% if user_stats %}
-const ctxUser = document.getElementById('userChart').getContext('2d');
-new Chart(ctxUser, {
-    type: 'bar',
-    data: {
-        labels: [{% for item in user_stats %}"{{ item.label|escapejs }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
-        datasets: [{
-            label: 'Skor Rata-rata Kepuasan',
-            data: [{% for item in user_stats %}{{ item.value|stringformat:"f" }}{% if not forloop.last %}, {% endif %}{% endfor %}],
-            backgroundColor: 'rgba(16, 185, 129, 0.6)',
-            borderColor: 'rgb(16, 185, 129)',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            x: {
-                beginAtZero: true,
-                max: 4,
-                ticks: { stepSize: 1 }
-            }
-        },
-        plugins: {
-            legend: { display: false }
-        }
-    }
-});
+<script type="application/json" id="user-data">
+[
+    {% for item in user_stats %}
+    { "label": "{{ item.label|escapejs }}", "value": {{ item.value|stringformat:"f" }} }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+]
+</script>
 {% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Fill progress bars dynamically to avoid VSCode CSS parsing errors from inline styles
+        document.querySelectorAll('.progress-bar-fill').forEach(el => {
+            const width = el.getAttribute('data-width');
+            if (width) {
+                el.style.width = width + '%';
+            }
+        });
+
+        const alumniDataEl = document.getElementById('alumni-data');
+        if (alumniDataEl) {
+            const alumniStats = JSON.parse(alumniDataEl.textContent);
+            const ctxAlumni = document.getElementById('alumniChart').getContext('2d');
+            new Chart(ctxAlumni, {
+                type: 'bar',
+                data: {
+                    labels: alumniStats.map(item => item.label),
+                    datasets: [{
+                        label: 'Skor Rata-rata CPL',
+                        data: alumniStats.map(item => item.value),
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                        borderColor: 'rgb(59, 130, 246)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 4,
+                            ticks: { stepSize: 1 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        const userDataEl = document.getElementById('user-data');
+        if (userDataEl) {
+            const userStats = JSON.parse(userDataEl.textContent);
+            const ctxUser = document.getElementById('userChart').getContext('2d');
+            new Chart(ctxUser, {
+                type: 'bar',
+                data: {
+                    labels: userStats.map(item => item.label),
+                    datasets: [{
+                        label: 'Skor Rata-rata Kepuasan',
+                        data: userStats.map(item => item.value),
+                        backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                        borderColor: 'rgb(16, 185, 129)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 4,
+                            ticks: { stepSize: 1 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+    });
 </script>
 {% endblock %}

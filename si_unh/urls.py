@@ -39,6 +39,9 @@ urlpatterns = [
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
     path('dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    
+    # Admin Tools
+    path('admin-tools/import-jadwal/', views.import_jadwal_excel, name='import_jadwal_excel'),
 ]
 
 if settings.DEBUG:

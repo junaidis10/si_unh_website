@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.http import FileResponse, Http404, HttpResponse
 from django.db.models import Q
@@ -8,6 +9,7 @@ from .models import *
 import os
 import pandas as pd
 from django.db.models import Avg, Count
+import openpyxl
 
 def home(request):
     """Homepage"""
@@ -68,8 +70,8 @@ def profile(request):
 
 def akademik(request):
     """Halaman Akademik"""
-    dosen_tetap = Dosen.objects.filter(kategori='tetap', is_active=True)
-    dosen_lb = Dosen.objects.filter(kategori='luar_biasa', is_active=True)
+    dosen_tetap = Dosen.objects.prefetch_related('mata_kuliah_diampu').filter(kategori='tetap', is_active=True)
+    dosen_lb = Dosen.objects.prefetch_related('mata_kuliah_diampu').filter(kategori='luar_biasa', is_active=True)
     
     context = {
         'dosen_tetap': dosen_tetap,
@@ -146,13 +148,195 @@ def kurikulum(request):
     except DocumentCategory.DoesNotExist:
         docs_rps = []
     
+    # 5. Jadwal Perkuliahan (sinkronisasi dengan Master Mata Kuliah)
+    # Mapping Master Mata Kuliah untuk sinkronisasi kode, nama, sks, dan semester
+    mk_master_map = {mk.kode.strip().upper(): mk for mk in MataKuliah.objects.filter(is_active=True)}
+    
+    jadwal_items = JadwalPerkuliahanItem.objects.filter(is_active=True).order_by('semester', 'dosen', 'kode_mk')
+    
+    # {semester_key: {dosen_key: [items]}}
+    jadwal_by_semester = {}
+    
+    # Semester labels mapping (from MataKuliah.SEMESTER_CHOICES)
+    semester_labels = dict(MataKuliah.SEMESTER_CHOICES)
+    
+    for item in jadwal_items:
+        # Sinkronisasi dengan Master Mata Kuliah jika ada kecocokan kode
+        clean_kode = item.kode_mk.strip().upper()
+        mk_master = mk_master_map.get(clean_kode)
+        
+        # Tentukan semester ID
+        if mk_master:
+            sem_id = mk_master.semester
+            # Gunakan data master agar sinkron sempurna
+            item.kode_mk = mk_master.kode
+            item.nama_mk = mk_master.nama
+            item.sks = mk_master.sks
+        else:
+            # Fallback jika tidak ada di master (mencoba parsing semester dari string)
+            import re
+            match = re.search(r'\d+', str(item.semester))
+            sem_id = int(match.group()) if match else 99
+        
+        sem_label = semester_labels.get(sem_id, f"Semester {item.semester}")
+        if sem_id == 0: sem_label = "Mata Kuliah Pilihan"
+        
+        sem_key = (sem_id, sem_label)
+        if sem_key not in jadwal_by_semester:
+            jadwal_by_semester[sem_key] = {}
+            
+        d_name = item.dosen or "Belum Ditentukan"
+        d_nidn = item.kode_dosen or ""
+        d_key = (d_name, d_nidn)
+        
+        if d_key not in jadwal_by_semester[sem_key]:
+            jadwal_by_semester[sem_key][d_key] = []
+            
+        jadwal_by_semester[sem_key][d_key].append(item)
+
+    # Urutkan semester (1, 2, 3... lalu 0, lalu 99)
+    sorted_sem_keys = sorted(jadwal_by_semester.keys(), key=lambda x: (x[0] if x[0] > 0 else 90) if x[0] != 99 else 100)
+    
+    # Rebuild a sorted list of dictionaries [{sem_label, dosen_items: {dosen_key: [items]}}]
+    # Or just keep it as a sorted dictionary for the template to iterate
+    ordered_jadwal = {}
+    for skey in sorted_sem_keys:
+        ordered_jadwal[skey[1]] = jadwal_by_semester[skey]
+
     context = {
         'docs_obe': docs_obe,
         'docs_kkni': docs_kkni,
         'mata_kuliah_by_semester': mata_kuliah_by_semester,
         'docs_rps': docs_rps,
+        'jadwal_by_semester': ordered_jadwal,
     }
     return render(request, 'kurikulum.html', context)
+
+
+@staff_member_required
+def import_jadwal_excel(request):
+    """Import jadwal perkuliahan dari file Excel"""
+    if request.method == 'POST':
+        excel_file = request.FILES.get('excel_file')
+        batch_label = request.POST.get('batch_label', '').strip()
+        clear_old = request.POST.get('clear_old')
+
+        if not excel_file:
+            messages.error(request, 'Silakan pilih file Excel.')
+            return redirect('import_jadwal_excel')
+
+        if not excel_file.name.endswith(('.xlsx', '.xls')):
+            messages.error(request, 'Format file tidak didukung. Gunakan file .xlsx atau .xls')
+            return redirect('import_jadwal_excel')
+
+        try:
+            wb = openpyxl.load_workbook(excel_file, read_only=True)
+            ws = wb.active
+
+            # Read header row and detect columns (case-insensitive keyword matching)
+            headers = []
+            for cell in ws[1]:
+                val = str(cell.value or '').strip().upper()
+                headers.append(val)
+
+            # Smart column detection
+            col_map = {}
+            for idx, h in enumerate(headers):
+                h_lower = h.lower()
+                if 'smt' in h_lower or 'semester' in h_lower:
+                    col_map['semester'] = idx
+                elif 'kode' in h_lower:
+                    col_map['kode'] = idx
+                elif 'nama' in h_lower and 'mata' in h_lower:
+                    col_map['nama'] = idx
+                elif 'nama' in h_lower and 'kode' not in h_lower:
+                    col_map['nama'] = idx
+                elif 'sks' in h_lower:
+                    col_map['sks'] = idx
+                elif 'jadwal' in h_lower:
+                    col_map['jadwal'] = idx
+                elif 'dosen' in h_lower or 'pengampu' in h_lower:
+                    col_map['dosen'] = idx
+
+            required = ['semester', 'kode', 'jadwal']
+            missing = [k for k in required if k not in col_map]
+            if missing:
+                messages.error(request, f'Kolom berikut tidak ditemukan di file Excel: {", ".join(missing)}. Header yang terdeteksi: {", ".join(headers)}')
+                return redirect('import_jadwal_excel')
+
+            # Clear old data if requested
+            if clear_old:
+                deleted_count = JadwalPerkuliahanItem.objects.all().delete()[0]
+                messages.info(request, f'{deleted_count} data jadwal lama telah dihapus.')
+
+            # Parse rows
+            items_to_create = []
+            row_count = 0
+            error_rows = []
+            for row_idx, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+                if row is None or all(c is None for c in row):
+                    continue
+                try:
+                    smt_val = str(row[col_map['semester']] or '').strip()
+                    if not smt_val:
+                        continue
+                    kode = str(row[col_map['kode']] or '').strip()
+                    nama = str(row[col_map.get('nama', -1)] or '').strip() if 'nama' in col_map else ''
+                    sks_val = row[col_map.get('sks', -1)] if 'sks' in col_map else 0
+                    sks = int(sks_val) if sks_val else 0
+                    jadwal = str(row[col_map['jadwal']] or '').strip()
+                    ruangan = str(row[col_map.get('ruangan', -1)] or '').strip() if 'ruangan' in col_map else ''
+                    dosen_str = str(row[col_map.get('dosen', -1)] or '').strip() if 'dosen' in col_map and col_map['dosen'] < len(row) else ''
+
+                    if not kode:
+                        continue
+
+                    # Lookup for automatic data filling if missing in Excel
+                    if not nama or sks == 0:
+                        mk_match = MataKuliah.objects.filter(kode__iexact=kode).first()
+                        if mk_match:
+                            if not nama: nama = mk_match.nama
+                            if sks == 0: sks = mk_match.sks
+
+                    # Lookup Dosen for NIDN
+                    kode_d_val = ""
+                    if dosen_str:
+                        d_match = Dosen.objects.filter(nama__icontains=dosen_str).first()
+                        if d_match:
+                            kode_d_val = d_match.nidn
+
+                    items_to_create.append(JadwalPerkuliahanItem(
+                        semester=smt_val,
+                        kode_mk=kode,
+                        nama_mk=nama,
+                        sks=sks,
+                        jadwal=jadwal,
+                        ruangan=ruangan,
+                        dosen=dosen_str,
+                        kode_dosen=kode_d_val,
+                        batch_label=batch_label,
+                    ))
+                    row_count += 1
+                except Exception as e:
+                    error_rows.append(f'Baris {row_idx}: {str(e)}')
+
+            if items_to_create:
+                JadwalPerkuliahanItem.objects.bulk_create(items_to_create)
+                messages.success(request, f'✅ Berhasil mengimpor {row_count} data jadwal perkuliahan.')
+            else:
+                messages.warning(request, 'Tidak ada data valid yang ditemukan dalam file Excel.')
+
+            if error_rows:
+                messages.warning(request, f'⚠️ {len(error_rows)} baris bermasalah: {"; ".join(error_rows[:5])}')
+
+            wb.close()
+            return redirect('import_jadwal_excel')
+
+        except Exception as e:
+            messages.error(request, f'Gagal memproses file Excel: {str(e)}')
+            return redirect('import_jadwal_excel')
+
+    return render(request, 'admin/import_jadwal_excel.html')
 
 
 def akreditasi(request):
