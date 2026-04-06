@@ -35,5 +35,5 @@ ENV/
 Thumbs.db
 
 # Uploads
-# media/
+media/
 # uploads/
