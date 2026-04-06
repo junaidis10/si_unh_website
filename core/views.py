@@ -71,10 +71,12 @@ def profile(request):
 def akademik(request):
     """Halaman Akademik"""
     dosen_tetap = Dosen.objects.prefetch_related('mata_kuliah_diampu').filter(kategori='tetap', is_active=True)
+    dosen_dtpr = Dosen.objects.prefetch_related('mata_kuliah_diampu').filter(kategori__in=['dtpr'], is_active=True)
     dosen_lb = Dosen.objects.prefetch_related('mata_kuliah_diampu').filter(kategori='luar_biasa', is_active=True)
     
     context = {
         'dosen_tetap': dosen_tetap,
+        'dosen_dtpr': dosen_dtpr,
         'dosen_lb': dosen_lb,
     }
     return render(request, 'akademik.html', context)
