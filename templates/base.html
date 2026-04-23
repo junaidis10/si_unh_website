@@ -224,7 +224,7 @@
                     <a href="{% url 'layanan' %}"
                         class="hover:text-gold-300 transition {% if 'layanan' in request.path %}text-gold-400 font-semibold{% endif %}">Layanan</a>
                     <a href="{% url 'media_informasi' %}"
-                        class="hover:text-gold-300 transition {% if 'media' in request.path %}text-gold-400 font-semibold{% endif %}">Media
+                        class="hover:text-gold-300 transition {% if 'media-informasi' in request.path %}text-gold-400 font-semibold{% endif %}">Media
                         & Informasi</a>
 
                     {% if user.is_staff %}

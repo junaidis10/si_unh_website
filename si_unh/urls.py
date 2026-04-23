@@ -25,7 +25,7 @@ urlpatterns = [
     path('survey/kurikulum/stats/', views.kurikulum_stats_view, name='kurikulum_stats_view'),
     path('survey/vmts/export/', views.export_vmts_excel, name='export_vmts_excel'),
     path('survey/vmts/stats/', views.vmts_stats_view, name='vmts_stats_view'),
-    path('media/', views.media_informasi, name='media_informasi'),
+    path('media-informasi/', views.media_informasi, name='media_informasi'),
     
     # News & Documents
     path('news/<slug:slug>/', views.news_detail, name='news_detail'),
