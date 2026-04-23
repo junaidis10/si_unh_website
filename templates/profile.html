@@ -2,6 +2,35 @@
 
 {% block title %}Profile Prodi - SI UNH{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Ensure numbering for nested lists in Visi/Misi/Tujuan */
+    .prose ol {
+        list-style-type: decimal !important;
+        padding-left: 1.25rem !important;
+        margin-left: 0.5rem !important;
+    }
+    .prose ol > li {
+        display: list-item !important;
+        padding-left: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    /* Nested lists styling */
+    .prose ol ol {
+        list-style-type: lower-alpha !important;
+        margin-top: 0.5rem !important;
+    }
+    .prose ol ol ol {
+        list-style-type: lower-roman !important;
+    }
+    /* Ensure markers are visible */
+    .prose li::marker {
+        font-weight: bold;
+        color: inherit;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Page Header -->
 <section class="gradient-purple-gold text-white py-16">
@@ -24,12 +53,14 @@
             <div class="relative group">
                 <div class="absolute -inset-1 bg-gradient-to-r from-primary-600 to-gold-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
                 <div class="relative bg-white p-8 rounded-2xl shadow-xl h-full border-t-4 border-primary-600">
-                    <div class="w-16 h-16 bg-primary-100 rounded-xl flex items-center justify-center mb-6">
-                        <i class="fas fa-eye text-primary-600 text-3xl"></i>
-                    </div>
-                    <h3 class="text-3xl font-bold text-primary-800 mb-6">Visi</h3>
-                    <div class="prose prose-lg text-gray-700 leading-relaxed italic">
-                        {{ visi_misi.visi|safe }}
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-primary-100 rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-sm">
+                            <i class="fas fa-eye text-primary-600 text-4xl"></i>
+                        </div>
+                        <h3 class="text-4xl font-bold text-primary-800 mb-8">Visi</h3>
+                        <div class="prose prose-2xl text-primary-700 leading-relaxed font-medium italic mx-auto text-center">
+                            {{ visi_misi.visi|safe }}
+                        </div>
                     </div>
                 </div>
             </div>
