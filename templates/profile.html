@@ -96,11 +96,62 @@
                         <div class="w-20 h-1 bg-purple-500 mt-1"></div>
                     </div>
                 </div>
-                <div class="prose prose-primary max-w-none text-gray-700 
-                            prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-2
-                            prose-li:marker:text-purple-600 prose-li:marker:font-bold
-                            lg:columns-2 lg:gap-12">
-                    {{ visi_misi.tujuan|safe }}
+                <div class="grid lg:grid-cols-2 gap-12">
+                    <!-- Tujuan Khusus (Left) -->
+                    <div class="relative p-8 bg-purple-50/50 rounded-2xl border-l-8 border-purple-500 shadow-sm transition-all hover:shadow-md">
+                        <div class="flex items-center mb-6">
+                            <div class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center text-white mr-4 shadow-lg">
+                                <i class="fas fa-list-check text-xl"></i>
+                            </div>
+                            <h4 class="text-3xl font-extrabold text-primary-900 tracking-tight">Tujuan Khusus</h4>
+                        </div>
+                        <ol class="space-y-6">
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mr-4 mt-1 shadow-sm">1</span>
+                                <p class="text-xl font-bold text-gray-800 leading-tight">Program Studi mampu meningkatkan kegiatan, penghargaan dan prestasi Dosen, Tendik, Mahasiswa dan Lulusan di tingkat Nasional dan Internasional</p>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mr-4 mt-1 shadow-sm">2</span>
+                                <p class="text-xl font-bold text-gray-800 leading-tight">Program Studi mampu meningkatkan ketersediaan sarana dan prasarana, lingkungan kampus yang nyaman dan bertaraf Internasional</p>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold mr-4 mt-1 shadow-sm">3</span>
+                                <p class="text-xl font-bold text-gray-800 leading-tight">Meningkatkan Rata-rata IPK lulusan >= 3.01 dan Meminimalkan mahasiswa Program Studi Sistem Informasi putus studi</p>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <!-- Tujuan Umum (Right) -->
+                    <div class="relative p-8 bg-gold-50/50 rounded-2xl border-l-8 border-gold-500 shadow-sm transition-all hover:shadow-md">
+                        <div class="flex items-center mb-6">
+                            <div class="w-12 h-12 bg-gold-500 rounded-lg flex items-center justify-center text-white mr-4 shadow-lg">
+                                <i class="fas fa-bullseye text-xl"></i>
+                            </div>
+                            <h4 class="text-3xl font-extrabold text-primary-900 tracking-tight">Tujuan Umum</h4>
+                        </div>
+                        <ol class="space-y-6">
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 w-8 h-8 bg-gold-500 text-white rounded-full flex items-center justify-center font-bold mr-4 mt-1 shadow-sm">1</span>
+                                <p class="text-xl font-bold text-gray-800 leading-tight">Menyiapkan mahasiswa dan lulusan yang memiliki kepribadian yang baik dalam menggunakan ilmu pengetahuan dan teknologi yang dikuasainya.</p>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 w-8 h-8 bg-gold-500 text-white rounded-full flex items-center justify-center font-bold mr-4 mt-1 shadow-sm">2</span>
+                                <p class="text-xl font-bold text-gray-800 leading-tight">Menyiapkan mahasiswa dan lulusan yang mampu untuk berpikir positif, bersikap kritis dan memberikan solusi pada suatu masalah (Organisasi).</p>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 w-8 h-8 bg-gold-500 text-white rounded-full flex items-center justify-center font-bold mr-4 mt-1 shadow-sm">3</span>
+                                <p class="text-xl font-bold text-gray-800 leading-tight">Menyiapkan mahasiswa dan lulusan yang memiliki kemampuan dalam mengembangkan, merumuskan dan memecahkan masalah umum kedalam bentuk sistem informasi dan menggunakan dalam suatu organisasi.</p>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 w-8 h-8 bg-gold-500 text-white rounded-full flex items-center justify-center font-bold mr-4 mt-1 shadow-sm">4</span>
+                                <p class="text-xl font-bold text-gray-800 leading-tight">Mengembangkan sikap toleransi dan berdaya saing yang tinggi dalam menciptakan lapangan kerja baru berupa bisnis digital.</p>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 w-8 h-8 bg-gold-500 text-white rounded-full flex items-center justify-center font-bold mr-4 mt-1 shadow-sm">5</span>
+                                <p class="text-xl font-bold text-gray-800 leading-tight">Meningkatkan Mutu Dosen, Lulusan, dan Luaran Program Studi</p>
+                            </li>
+                        </ol>
+                    </div>
                 </div>
             </div>
         </div>
