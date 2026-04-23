@@ -28,6 +28,41 @@
         font-weight: bold;
         color: inherit;
     }
+    
+    /* Bubble list style for Misi to match Tujuan Strategis */
+    .misi-bubble-list ol {
+        list-style-type: none !important;
+        counter-reset: misi-counter;
+        padding-left: 0 !important;
+    }
+    .misi-bubble-list ol > li {
+        position: relative;
+        padding-left: 3rem !important;
+        margin-bottom: 1.5rem !important;
+        display: block !important;
+        font-size: 1.25rem !important; /* text-xl */
+        font-weight: 700 !important; /* font-bold */
+        color: #1f2937 !important; /* text-gray-800 */
+        line-height: 1.25 !important; /* leading-tight */
+    }
+    .misi-bubble-list ol > li::before {
+        content: counter(misi-counter);
+        counter-increment: misi-counter;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 2rem;
+        height: 2rem;
+        background-color: #f59e0b; /* gold-500 */
+        color: white;
+        border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.875rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
 </style>
 {% endblock %}
 
@@ -50,34 +85,28 @@
 
         <div class="grid lg:grid-cols-2 gap-8 mb-12">
             <!-- Visi Card -->
-            <div class="relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-primary-600 to-gold-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                <div class="relative bg-white p-8 rounded-2xl shadow-xl h-full border-t-4 border-primary-600">
-                    <div class="text-center">
-                        <div class="w-20 h-20 bg-primary-100 rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-sm">
-                            <i class="fas fa-eye text-primary-600 text-4xl"></i>
-                        </div>
-                        <h3 class="text-4xl font-bold text-primary-800 mb-8">Visi</h3>
-                        <div class="prose prose-2xl text-primary-700 leading-relaxed font-medium italic mx-auto text-center">
-                            {{ visi_misi.visi|safe }}
-                        </div>
+            <div class="relative p-8 bg-purple-50/50 rounded-2xl border-l-8 border-purple-500 shadow-sm transition-all hover:shadow-md">
+                <div class="flex items-center mb-8">
+                    <div class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center text-white mr-4 shadow-lg">
+                        <i class="fas fa-eye text-xl"></i>
                     </div>
+                    <h3 class="text-3xl font-extrabold text-primary-900 tracking-tight">Visi</h3>
+                </div>
+                <div class="text-3xl text-gold-500 leading-relaxed font-extrabold text-center">
+                    "Menjadi program studi unggul dan berdaya saing tinggi dalam Bidang Rekayasa Sistem Informasi dan Bisnis Digital berjiwa Technopreneur berskala Nasional tahun 2030"
                 </div>
             </div>
 
             <!-- Misi Card -->
-            <div class="relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-gold-500 to-primary-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                <div class="relative bg-white p-8 rounded-2xl shadow-xl h-full border-t-4 border-gold-500">
-                    <div class="w-16 h-16 bg-gold-100 rounded-xl flex items-center justify-center mb-6">
-                        <i class="fas fa-bullseye text-gold-600 text-3xl"></i>
+            <div class="relative p-8 bg-gold-50/50 rounded-2xl border-l-8 border-gold-500 shadow-sm transition-all hover:shadow-md">
+                <div class="flex items-center mb-8">
+                    <div class="w-12 h-12 bg-gold-500 rounded-lg flex items-center justify-center text-white mr-4 shadow-lg">
+                        <i class="fas fa-bullseye text-xl"></i>
                     </div>
-                    <h3 class="text-3xl font-bold text-primary-800 mb-6">Misi Kami</h3>
-                    <div class="prose prose-primary max-w-none text-gray-700 
-                                prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-2
-                                prose-li:marker:text-gold-600 prose-li:marker:font-bold">
-                        {{ visi_misi.misi|safe }}
-                    </div>
+                    <h3 class="text-3xl font-extrabold text-primary-900 tracking-tight">Misi</h3>
+                </div>
+                <div class="misi-bubble-list">
+                    {{ visi_misi.misi|safe }}
                 </div>
             </div>
         </div>
