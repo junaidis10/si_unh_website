@@ -14,7 +14,6 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 /staticfiles
-/static
 
 # Environment
 .env
@@ -34,6 +33,7 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Uploads
-media/
-# uploads/
+# Media - TRACK media files untuk deployment
+# Hanya ignore file temporary/cache
+media/.DS_Store
+media/**/.DS_Store

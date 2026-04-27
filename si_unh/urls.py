@@ -51,8 +51,13 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+else:
+    # Production: tetap serve media via Django jika belum ada Nginx/Apache
+    # Untuk performa optimal, gunakan whitenoise atau konfigurasi web server
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Admin site customization
 admin.site.site_header = "Program Studi Sistem Informasi UNH Administrasi"
 admin.site.site_title = "Program Studi Sistem Informasi UNH Administrasi"
 admin.site.index_title = "Welcome to Program Studi Sistem Informasi UNH Administrasi"
+

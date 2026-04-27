@@ -336,7 +336,14 @@ def import_penelitian(request):
 
 @staff_member_required
 def tarik_sinta(request, dosen_id):
-    """Scraping profil Sinta yang dioptimalkan untuk performa dan reliabilitas"""
+    """Scraping profil Sinta yang dioptimalkan untuk performa dan reliabilitas.
+    
+    Mendukung semua view SINTA:
+    - Articles: Google Scholar, Scopus, Garuda, WoS, RAMA
+    - Researches: Data penelitian (view=researches)
+    - Community Services: Data pengabdian (view=services)
+    - Books: Data buku (view=books)
+    """
     dosen = get_object_or_404(Dosen, id=dosen_id)
     sinta_link = dosen.sinta_link
     
@@ -346,63 +353,72 @@ def tarik_sinta(request, dosen_id):
         
     try:
         # Normalisasi domain ke yang terbaru (kemdiktisaintek)
-        if 'sinta.kemdikbud.go.id' in sinta_link:
-            sinta_link = sinta_link.replace('sinta.kemdikbud.go.id', 'sinta.kemdiktisaintek.go.id')
-        elif 'sinta.ristekbrin.go.id' in sinta_link:
-            sinta_link = sinta_link.replace('sinta.ristekbrin.go.id', 'sinta.kemdiktisaintek.go.id')
+        for old_domain in ['sinta.kemdikbud.go.id', 'sinta.ristekbrin.go.id']:
+            if old_domain in sinta_link:
+                sinta_link = sinta_link.replace(old_domain, 'sinta.kemdiktisaintek.go.id')
+                break
             
-        # Hapus trailing slash
+        # Hapus trailing slash lalu tambahkan kembali (SINTA butuh / sebelum ?view=)
         sinta_link = sinta_link.rstrip('/')
             
-        # Daftar URL dengan prioritas (Google Scholar biasanya paling lengkap)
+        # Daftar URL dengan prioritas dan jenis data
+        # PENTING: SINTA menggunakan format /{id}/?view=xxx (dengan slash sebelum ?)
         urls_to_try = [
-            (f"{sinta_link}?view=googlescholar", 'publikasi'),
-            (f"{sinta_link}?view=garuda", 'publikasi'),
-            (f"{sinta_link}?view=books", 'buku'),
+            # Artikel / Publikasi
+            (f"{sinta_link}/?view=googlescholar", 'publikasi'),
+            (f"{sinta_link}/?view=garuda", 'publikasi'),
+            # Penelitian (Riset) — URL yang benar: ?view=researches
+            (f"{sinta_link}/?view=researches", 'penelitian'),
+            # Pengabdian Masyarakat (PKM) — URL yang benar: ?view=services
+            (f"{sinta_link}/?view=services", 'pkm'),
+            # Buku
+            (f"{sinta_link}/?view=books", 'buku'),
         ]
-        
-        # Tambahkan overview sebagai fallback terakhir
-        urls_to_try.append((sinta_link, 'publikasi'))
         
         session = requests.Session()
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.5',
+            'Connection': 'keep-alive',
         }
         
         count = 0
+        count_by_jenis = {'publikasi': 0, 'penelitian': 0, 'pkm': 0, 'buku': 0}
         errors = []
         
         for url, default_jenis in urls_to_try:
             try:
-                # Timeout lebih ketat (7s) untuk menghindari 504 Gateway Timeout pada server
-                response = session.get(url, headers=headers, timeout=7)
+                response = session.get(url, headers=headers, timeout=12)
                 
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, 'html.parser')
+                    
+                    # CSS Selector utama: div.ar-list-item
                     papers = soup.find_all('div', class_='ar-list-item')
                     
                     if not papers:
-                        # Coba selector alternatif jika struktur berubah
+                        # Fallback selector
                         papers = soup.select('.ar-list-item, .list-item, article.ar-list-item')
                     
                     for p in papers:
-                        title_elem = p.find(['div', 'h3', 'a'], class_='ar-title')
+                        # === JUDUL ===
+                        # Selector: div.ar-title > a
+                        title_elem = p.find('div', class_='ar-title')
                         if not title_elem:
                             title_elem = p.select_one('.ar-title, h3, .title')
                             
                         if not title_elem: continue
                         
-                        # Ambil teks judul (bisa di dalam tag <a> atau langsung)
                         a_tag = title_elem.find('a')
                         title = a_tag.text.strip() if a_tag else title_elem.text.strip()
                         
                         if not title or len(title) < 5: continue
                         
-                        # Ekstrak Tahun
-                        year = 2025 # Default
-                        year_elem = p.find(['a', 'span', 'div'], class_='ar-year')
+                        # === TAHUN ===
+                        # Selector: a.ar-year
+                        year = 2025
+                        year_elem = p.find('a', class_='ar-year')
                         if not year_elem:
                             year_elem = p.select_one('.ar-year, .year')
                             
@@ -411,8 +427,45 @@ def tarik_sinta(request, dosen_id):
                             if match:
                                 year = int(match.group())
                         
-                        # Cek duplikat berdasarkan judul dan dosen terkait
-                        # Gunakan iexact untuk case-insensitive match
+                        # === METADATA TAMBAHAN ===
+                        abstrak_parts = []
+                        
+                        # Untuk researches/services: ambil info Leader dan Personils
+                        if default_jenis in ('penelitian', 'pkm'):
+                            metas = p.find_all('div', class_='ar-meta')
+                            for meta in metas:
+                                meta_text = meta.get_text(strip=True)
+                                if 'Leader' in meta_text:
+                                    abstrak_parts.append(meta_text)
+                                elif 'Personils' in meta_text or 'Personil' in meta_text:
+                                    abstrak_parts.append(meta_text)
+                                    
+                            # Ambil info pendanaan dari ar-quartile
+                            quartiles = p.find_all('a', class_='ar-quartile')
+                            for q in quartiles:
+                                q_text = q.get_text(strip=True)
+                                if 'Rp' in q_text:
+                                    abstrak_parts.append(f'Dana: {q_text}')
+                                elif q_text and q_text not in ('Approved', ''):
+                                    abstrak_parts.append(q_text)
+                        else:
+                            # Untuk artikel: ambil info penulis dan jurnal
+                            pub_elem = p.find('a', class_='ar-pub')
+                            if pub_elem:
+                                abstrak_parts.append(f'Jurnal: {pub_elem.get_text(strip=True)}')
+                            
+                            cited_elem = p.find('a', class_='ar-cited')
+                            if cited_elem:
+                                abstrak_parts.append(cited_elem.get_text(strip=True))
+                        
+                        abstrak = '; '.join(abstrak_parts) if abstrak_parts else 'Data ditarik otomatis dari profil SINTA.'
+                        
+                        # === LINK PAPER ===
+                        paper_link = sinta_link  # Default
+                        if a_tag and a_tag.get('href', '#!') != '#!':
+                            paper_link = a_tag['href']
+                        
+                        # === SIMPAN (cek duplikat) ===
                         if not Penelitian.objects.filter(title__iexact=title, peneliti__icontains=dosen.nama).exists():
                             Penelitian.objects.create(
                                 title=title,
@@ -420,36 +473,45 @@ def tarik_sinta(request, dosen_id):
                                 tipe_peneliti='dosen',
                                 peneliti=dosen.nama,
                                 year=year,
-                                abstrak='Data ditarik otomatis dari profil SINTA.',
-                                link=sinta_link
+                                abstrak=abstrak,
+                                link=paper_link
                             )
                             count += 1
+                            count_by_jenis[default_jenis] = count_by_jenis.get(default_jenis, 0) + 1
                 
                 elif response.status_code == 503:
                     errors.append("SINTA sedang membatasi akses (Rate Limited).")
                 
-                # Jeda singkat untuk menghindari deteksi bot / rate limiting
-                if count > 0:
-                    time.sleep(0.5)
+                # Jeda antar request untuk menghindari rate limiting
+                time.sleep(0.8)
                     
             except requests.exceptions.Timeout:
-                errors.append(f"Waktu habis saat mengakses {url.split('view=')[-1] if 'view=' in url else 'overview'}")
+                view_name = url.split('view=')[-1] if 'view=' in url else 'overview'
+                errors.append(f"Timeout saat akses {view_name}")
             except Exception as e:
                 continue
                     
         if count > 0:
-            msg = f'✅ Berhasil menarik {count} data baru dari Sinta untuk {dosen.nama}.'
+            # Buat pesan detail per jenis
+            detail_parts = []
+            jenis_labels = {'publikasi': 'publikasi', 'penelitian': 'penelitian', 'pkm': 'pengabdian', 'buku': 'buku'}
+            for jenis, jml in count_by_jenis.items():
+                if jml > 0:
+                    detail_parts.append(f'{jml} {jenis_labels.get(jenis, jenis)}')
+            detail = ', '.join(detail_parts)
+            
+            msg = f'✅ Berhasil menarik {count} data baru dari SINTA untuk {dosen.nama} ({detail}).'
             if errors:
-                msg += f' (Beberapa sumber terlewati: {", ".join(set(errors))})'
+                msg += f' ⚠️ Beberapa sumber terlewati: {", ".join(set(errors))}'
             messages.success(request, msg)
         else:
             if errors:
-                messages.warning(request, f'Gagal menarik data Sinta: {", ".join(set(errors))}')
+                messages.warning(request, f'Gagal menarik data SINTA: {", ".join(set(errors))}')
             else:
-                messages.info(request, f'Tidak ada data baru yang ditemukan di Sinta untuk {dosen.nama}.')
+                messages.info(request, f'Tidak ada data baru yang ditemukan di SINTA untuk {dosen.nama}.')
             
     except Exception as e:
-        messages.error(request, f'Terjadi kesalahan sistem saat memproses Sinta: {str(e)}')
+        messages.error(request, f'Terjadi kesalahan sistem saat memproses SINTA: {str(e)}')
         
     return redirect('admin:core_dosen_change', dosen.id)
 
