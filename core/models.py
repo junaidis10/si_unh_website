@@ -257,7 +257,7 @@ class Penelitian(models.Model):
     year = models.IntegerField(verbose_name="Tahun")
     abstrak = RichTextField(verbose_name="Abstrak / Deskripsi")
     file = models.FileField(upload_to='penelitian/', blank=True, verbose_name="File Dokumen")
-    link = models.URLField(blank=True, verbose_name="Link Publikasi")
+    link = models.URLField(max_length=1000, blank=True, verbose_name="Link Publikasi")
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:

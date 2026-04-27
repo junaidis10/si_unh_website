@@ -8,6 +8,8 @@ from django.db.models import Q, Avg, Count
 from .models import *
 import os
 import requests
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import pandas as pd
 from bs4 import BeautifulSoup
 import openpyxl
@@ -358,6 +360,9 @@ def tarik_sinta(request, dosen_id):
                 sinta_link = sinta_link.replace(old_domain, 'sinta.kemdiktisaintek.go.id')
                 break
             
+        # Hapus fragment '#!' dan query param yang sering tersalin pada SINTA ID
+        sinta_link = sinta_link.split('#')[0].split('?')[0]
+        
         # Hapus trailing slash lalu tambahkan kembali (SINTA butuh / sebelum ?view=)
         sinta_link = sinta_link.rstrip('/')
             
@@ -389,7 +394,7 @@ def tarik_sinta(request, dosen_id):
         
         for url, default_jenis in urls_to_try:
             try:
-                response = session.get(url, headers=headers, timeout=12)
+                response = session.get(url, headers=headers, timeout=15, verify=False)
                 
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, 'html.parser')
@@ -489,6 +494,8 @@ def tarik_sinta(request, dosen_id):
                 view_name = url.split('view=')[-1] if 'view=' in url else 'overview'
                 errors.append(f"Timeout saat akses {view_name}")
             except Exception as e:
+                view_name = url.split('view=')[-1] if 'view=' in url else 'overview'
+                errors.append(f"Error pada {view_name}: {str(e)[:50]}")
                 continue
                     
         if count > 0:
