@@ -11,6 +11,8 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 import openpyxl
+import re
+import time
 
 def home(request):
     """Homepage"""
@@ -334,7 +336,7 @@ def import_penelitian(request):
 
 @staff_member_required
 def tarik_sinta(request, dosen_id):
-    """Scraping sederhana profil Sinta untuk mengambil daftar publikasi"""
+    """Scraping profil Sinta yang dioptimalkan untuk performa dan reliabilitas"""
     dosen = get_object_or_404(Dosen, id=dosen_id)
     sinta_link = dosen.sinta_link
     
@@ -343,48 +345,74 @@ def tarik_sinta(request, dosen_id):
         return redirect('admin:core_dosen_change', dosen.id)
         
     try:
-        # Hapus trailing slash jika ada
-        if sinta_link.endswith('/'):
-            sinta_link = sinta_link[:-1]
+        # Normalisasi domain ke yang terbaru (kemdiktisaintek)
+        if 'sinta.kemdikbud.go.id' in sinta_link:
+            sinta_link = sinta_link.replace('sinta.kemdikbud.go.id', 'sinta.kemdiktisaintek.go.id')
+        elif 'sinta.ristekbrin.go.id' in sinta_link:
+            sinta_link = sinta_link.replace('sinta.ristekbrin.go.id', 'sinta.kemdiktisaintek.go.id')
             
+        # Hapus trailing slash
+        sinta_link = sinta_link.rstrip('/')
+            
+        # Daftar URL dengan prioritas (Google Scholar biasanya paling lengkap)
         urls_to_try = [
-            (sinta_link + '/?view=googlescholar', 'publikasi'),
-            (sinta_link + '/?view=garuda', 'publikasi'),
-            (sinta_link + '/?view=books', 'buku'),
-            (sinta_link, 'publikasi')
+            (f"{sinta_link}?view=googlescholar", 'publikasi'),
+            (f"{sinta_link}?view=garuda", 'publikasi'),
+            (f"{sinta_link}?view=books", 'buku'),
         ]
         
+        # Tambahkan overview sebagai fallback terakhir
+        urls_to_try.append((sinta_link, 'publikasi'))
+        
+        session = requests.Session()
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
         }
         
         count = 0
+        errors = []
         
         for url, default_jenis in urls_to_try:
             try:
-                response = requests.get(url, headers=headers, timeout=15)
+                # Timeout lebih ketat (7s) untuk menghindari 504 Gateway Timeout pada server
+                response = session.get(url, headers=headers, timeout=7)
+                
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, 'html.parser')
                     papers = soup.find_all('div', class_='ar-list-item')
                     
+                    if not papers:
+                        # Coba selector alternatif jika struktur berubah
+                        papers = soup.select('.ar-list-item, .list-item, article.ar-list-item')
+                    
                     for p in papers:
-                        title_elem = p.find('div', class_='ar-title')
+                        title_elem = p.find(['div', 'h3', 'a'], class_='ar-title')
+                        if not title_elem:
+                            title_elem = p.select_one('.ar-title, h3, .title')
+                            
                         if not title_elem: continue
                         
+                        # Ambil teks judul (bisa di dalam tag <a> atau langsung)
                         a_tag = title_elem.find('a')
-                        if not a_tag: continue
-                        title = a_tag.text.strip()
-                        if not title: continue
+                        title = a_tag.text.strip() if a_tag else title_elem.text.strip()
+                        
+                        if not title or len(title) < 5: continue
                         
                         # Ekstrak Tahun
-                        year_elem = p.find('a', class_='ar-year')
-                        year = 2025
+                        year = 2025 # Default
+                        year_elem = p.find(['a', 'span', 'div'], class_='ar-year')
+                        if not year_elem:
+                            year_elem = p.select_one('.ar-year, .year')
+                            
                         if year_elem:
                             match = re.search(r'\d{4}', year_elem.text)
                             if match:
                                 year = int(match.group())
                         
-                        # Cek duplikat
+                        # Cek duplikat berdasarkan judul dan dosen terkait
+                        # Gunakan iexact untuk case-insensitive match
                         if not Penelitian.objects.filter(title__iexact=title, peneliti__icontains=dosen.nama).exists():
                             Penelitian.objects.create(
                                 title=title,
@@ -392,20 +420,36 @@ def tarik_sinta(request, dosen_id):
                                 tipe_peneliti='dosen',
                                 peneliti=dosen.nama,
                                 year=year,
-                                abstrak='Data ditarik otomatis dari Sinta Kemdiktisaintek.',
+                                abstrak='Data ditarik otomatis dari profil SINTA.',
                                 link=sinta_link
                             )
                             count += 1
-            except:
+                
+                elif response.status_code == 503:
+                    errors.append("SINTA sedang membatasi akses (Rate Limited).")
+                
+                # Jeda singkat untuk menghindari deteksi bot / rate limiting
+                if count > 0:
+                    time.sleep(0.5)
+                    
+            except requests.exceptions.Timeout:
+                errors.append(f"Waktu habis saat mengakses {url.split('view=')[-1] if 'view=' in url else 'overview'}")
+            except Exception as e:
                 continue
                     
         if count > 0:
-            messages.success(request, f'✅ Berhasil menarik {count} data baru dari Sinta untuk {dosen.nama}.')
+            msg = f'✅ Berhasil menarik {count} data baru dari Sinta untuk {dosen.nama}.'
+            if errors:
+                msg += f' (Beberapa sumber terlewati: {", ".join(set(errors))})'
+            messages.success(request, msg)
         else:
-            messages.info(request, f'Tidak ada data baru yang ditemukan di Sinta untuk {dosen.nama}.')
+            if errors:
+                messages.warning(request, f'Gagal menarik data Sinta: {", ".join(set(errors))}')
+            else:
+                messages.info(request, f'Tidak ada data baru yang ditemukan di Sinta untuk {dosen.nama}.')
             
     except Exception as e:
-        messages.error(request, f'Terjadi kesalahan saat memproses Sinta: {str(e)}')
+        messages.error(request, f'Terjadi kesalahan sistem saat memproses Sinta: {str(e)}')
         
     return redirect('admin:core_dosen_change', dosen.id)
 
