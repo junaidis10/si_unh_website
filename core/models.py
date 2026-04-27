@@ -70,7 +70,7 @@ class Dosen(models.Model):
     """Data Dosen"""
     KATEGORI_CHOICES = [
         ('tetap', 'Dosen Tetap'),
-        ('dtpr', 'Dosen Tetap Pembagi Rasio'),
+        ('dtpr', 'Dosen Tetap Penghitung Rasio'),
         ('luar_biasa', 'Dosen Luar Biasa'),
     ]
     
@@ -196,7 +196,17 @@ class Gallery(models.Model):
     @property
     def embed_url(self):
         if self.video_url:
-            return self.video_url.replace("watch?v=", "embed/")
+            import re
+            # Regex for YouTube ID extraction
+            yt_regex = r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})'
+            match = re.search(yt_regex, self.video_url)
+            if match:
+                video_id = match.group(1)
+                return f"https://www.youtube.com/embed/{video_id}"
+            
+            # Fallback for standard replacement if regex fails
+            if "watch?v=" in self.video_url:
+                return self.video_url.replace("watch?v=", "embed/")
         return self.video_url
 
 
@@ -227,19 +237,27 @@ class Prestasi(models.Model):
 
 
 class Penelitian(models.Model):
-    """Penelitian dan Pengabdian"""
+    """Penelitian, PKM, dan Publikasi"""
     JENIS_CHOICES = [
-        ('penelitian', 'Penelitian'),
-        ('pengabdian', 'Pengabdian Masyarakat'),
+        ('penelitian', 'Penelitian (Riset)'),
+        ('pkm', 'PKM (Pengabdian Masyarakat)'),
+        ('publikasi', 'Publikasi Artikel Jurnal'),
+        ('buku', 'Buku (Referensi/Monograf)'),
+    ]
+    TIPE_PENELITI_CHOICES = [
+        ('dosen', 'Dosen'),
+        ('mahasiswa', 'Mahasiswa'),
+        ('participant', 'Participant'),
     ]
     
-    title = models.CharField(max_length=300)
-    jenis = models.CharField(max_length=20, choices=JENIS_CHOICES)
-    peneliti = models.CharField(max_length=200, help_text='Nama peneliti (pisahkan dengan koma)')
-    year = models.IntegerField()
-    abstrak = RichTextField()
-    file = models.FileField(upload_to='penelitian/', blank=True)
-    link = models.URLField(blank=True)
+    title = models.CharField(max_length=300, verbose_name="Judul Karya")
+    jenis = models.CharField(max_length=20, choices=JENIS_CHOICES, verbose_name="Jenis Karya")
+    tipe_peneliti = models.CharField(max_length=20, choices=TIPE_PENELITI_CHOICES, default='dosen', verbose_name="Kategori Peneliti")
+    peneliti = models.CharField(max_length=200, help_text='Nama peneliti (pisahkan dengan koma)', verbose_name="Nama Peneliti / Penulis")
+    year = models.IntegerField(verbose_name="Tahun")
+    abstrak = RichTextField(verbose_name="Abstrak / Deskripsi")
+    file = models.FileField(upload_to='penelitian/', blank=True, verbose_name="File Dokumen")
+    link = models.URLField(blank=True, verbose_name="Link Publikasi")
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:

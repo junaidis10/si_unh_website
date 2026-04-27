@@ -8,35 +8,156 @@
     </div>
 </section>
 
-<section class="py-16 bg-white">
+<section class="py-16 bg-white overflow-hidden">
     <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-primary-700 mb-8 text-center">Link Layanan</h2>
+        <h2 class="text-4xl font-extrabold text-primary-800 mb-12 text-center relative">
+            Layanan Akademik & Digital
+            <span class="block w-20 h-1 bg-gold-500 mx-auto mt-4 rounded-full"></span>
+        </h2>
+
+        <!-- Featured: Digital Library & Publication Center -->
+        <div class="mb-16">
+            <div class="relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-primary-600 via-gold-500 to-primary-600 rounded-3xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                <div class="relative bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 p-8 lg:p-12">
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+                        <!-- Campus Library -->
+                        <div class="group/item">
+                            <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover/item:bg-blue-600 group-hover/item:text-white transition-all duration-500 shadow-sm group-hover/item:rotate-6">
+                                <i class="fas fa-book-open text-3xl"></i>
+                            </div>
+                            <h4 class="font-bold text-xl text-gray-800 mb-3">Perpustakaan Kampus</h4>
+                            <p class="text-sm text-gray-500 mb-6 leading-relaxed">Akses koleksi buku fisik dan katalog digital perpustakaan pusat Universitas Nurdin Hamzah.</p>
+                            <a href="https://unh.ac.id/fasilitas/sarana-prasarana/perpustakaan/perpustakaan" target="_blank" class="inline-flex items-center gap-2 text-primary-600 font-bold hover:text-primary-800 transition">
+                                Lihat Koleksi <i class="fas fa-arrow-right text-xs"></i>
+                            </a>
+                        </div>
+
+                        <!-- SI Library -->
+                        <div class="group/item">
+                            <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-6 group-hover/item:bg-purple-600 group-hover/item:text-white transition-all duration-500 shadow-sm group-hover/item:rotate-6">
+                                <i class="fas fa-laptop-code text-3xl"></i>
+                            </div>
+                            <h4 class="font-bold text-xl text-gray-800 mb-3">Perpustakaan Prodi SI</h4>
+                            <p class="text-sm text-gray-500 mb-6 leading-relaxed">Koleksi referensi digital, modul praktikum, dan materi khusus Program Studi Sistem Informasi.</p>
+                            <a href="#" class="inline-flex items-center gap-2 text-primary-600 font-bold hover:text-primary-800 transition">
+                                Akses Materi <i class="fas fa-arrow-right text-xs"></i>
+                            </a>
+                        </div>
+
+                        <!-- Lecturer Books -->
+                        <div class="group/item">
+                            <div class="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-6 group-hover/item:bg-amber-600 group-hover/item:text-white transition-all duration-500 shadow-sm group-hover/item:rotate-6">
+                                <i class="fas fa-pen-nib text-3xl"></i>
+                            </div>
+                            <h4 class="font-bold text-xl text-gray-800 mb-3">Buku Karya Dosen</h4>
+                            <p class="text-sm text-gray-500 mb-6 leading-relaxed">Showcase buku referensi, monograf, dan buku ajar orisinal karya dosen tetap Program Studi SI.</p>
+                            <a href="#lecturer-works" class="inline-flex items-center gap-2 text-primary-600 font-bold hover:text-primary-800 transition">
+                                Lihat Daftar <i class="fas fa-arrow-right text-xs"></i>
+                            </a>
+                        </div>
+
+                        <!-- Journal Publications -->
+                        <div class="group/item">
+                            <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 group-hover/item:bg-emerald-600 group-hover/item:text-white transition-all duration-500 shadow-sm group-hover/item:rotate-6">
+                                <i class="fas fa-file-invoice text-3xl"></i>
+                            </div>
+                            <h4 class="font-bold text-xl text-gray-800 mb-3">Upload Jurnal</h4>
+                            <p class="text-sm text-gray-500 mb-6 leading-relaxed">Fasilitas bagi dosen & mahasiswa untuk mengunggah publikasi (Quartile, Sinta, Prosiding, dll).</p>
+                            <a href="{% url 'submit_publikasi' %}" class="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700 transition shadow-md">
+                                <i class="fas fa-cloud-upload-alt"></i> Upload Jurnal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="grid md:grid-cols-4 gap-6">
             {% for link in links %}
+            {% if link.kategori != 'vclass' %}
             <a href="{{ link.url }}" target="_blank"
-                class="block bg-gradient-to-br from-primary-500 to-gold-500 text-white rounded-lg p-6 text-center hover-scale">
-                <i class="{{ link.icon }} text-5xl mb-4"></i>
+                class="block bg-gradient-to-br from-primary-500 to-gold-500 text-white rounded-xl p-6 text-center hover-scale shadow-lg hover:shadow-primary-500/20 transition-all">
+                <i class="{{ link.icon }} text-5xl mb-4 text-white/90"></i>
                 <h3 class="font-bold text-lg">{{ link.name }}</h3>
             </a>
+            {% endif %}
             {% endfor %}
             <!-- Survey Link VMTS -->
             <a href="{% url 'survey_view' %}"
-                class="block bg-gradient-to-br from-gold-500 to-primary-600 text-white rounded-lg p-6 text-center hover-scale">
+                class="block bg-gradient-to-br from-gold-500 to-primary-600 text-white rounded-xl p-6 text-center hover-scale shadow-lg">
                 <i class="fas fa-poll-h text-5xl mb-4"></i>
                 <h3 class="font-bold text-lg">Survei Pemahaman VMTS</h3>
             </a>
             <!-- Survey Link Pengguna Lulusan -->
             <a href="{% url 'submit_survey_lulusan' %}"
-                class="block bg-gradient-to-br from-primary-600 to-primary-800 text-white rounded-lg p-6 text-center hover-scale">
+                class="block bg-gradient-to-br from-primary-600 to-primary-800 text-white rounded-xl p-6 text-center hover-scale shadow-lg">
                 <i class="fas fa-users-cog text-5xl mb-4"></i>
                 <h3 class="font-bold text-lg">Survei Kepuasan Pengguna</h3>
             </a>
             <!-- Survey Link Kurikulum -->
             <a href="{% url 'submit_survey_kurikulum' %}"
-                class="block bg-gradient-to-br from-primary-800 to-gold-600 text-white rounded-lg p-6 text-center hover-scale">
+                class="block bg-gradient-to-br from-primary-800 to-gold-600 text-white rounded-xl p-6 text-center hover-scale shadow-lg">
                 <i class="fas fa-book-reader text-5xl mb-4"></i>
                 <h3 class="font-bold text-lg">Survei Evaluasi Kurikulum</h3>
             </a>
+        </div>
+    </div>
+</section>
+
+<!-- Lecturer Works Section (New) -->
+<section id="lecturer-works" class="py-16 bg-gray-50 border-t border-gray-100">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4 text-center md:text-left">
+            <div>
+                <h2 class="text-3xl font-bold text-primary-800">Buku & Publikasi Unggulan</h2>
+                <p class="text-gray-600">Karya intelektual dosen Program Studi Sistem Informasi UNH</p>
+            </div>
+            <a href="{% url 'riset_publikasi' 'dosen' %}" class="inline-flex items-center gap-2 text-primary-700 font-bold hover:text-gold-600 transition">
+                Lihat Semua Publikasi <i class="fas fa-chevron-right text-xs"></i>
+            </a>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Lecturer Books Spotlight -->
+            {% for book in lecturer_books %}
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex gap-4 hover:shadow-md transition">
+                <div class="w-20 h-28 bg-primary-100 rounded-lg flex-shrink-0 flex items-center justify-center text-primary-600 overflow-hidden relative">
+                    <i class="fas fa-book text-4xl opacity-20 absolute"></i>
+                    <span class="text-[10px] font-bold text-center px-2 relative z-10 leading-tight">{{ book.title|truncatechars:40 }}</span>
+                </div>
+                <div>
+                    <span class="inline-block px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded uppercase mb-2">Buku</span>
+                    <h4 class="font-bold text-gray-800 text-sm mb-1 line-clamp-2">{{ book.title }}</h4>
+                    <p class="text-xs text-gray-500 mb-2 italic">{{ book.peneliti }}</p>
+                    <div class="text-[10px] text-gray-400">
+                        <i class="far fa-calendar-alt mr-1"></i> {{ book.year }}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Placeholder if no books -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-center text-gray-400 italic">
+                Belum ada data buku karya dosen.
+            </div>
+            {% endfor %}
+            
+            <!-- Latest Publications Spotlight -->
+            {% for pub in lecturer_publications|slice:":2" %}
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex gap-4 hover:shadow-md transition">
+                <div class="w-12 h-12 rounded-full bg-emerald-100 flex-shrink-0 flex items-center justify-center text-emerald-600">
+                    <i class="fas fa-file-alt text-xl"></i>
+                </div>
+                <div>
+                    <span class="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded uppercase mb-2">Jurnal</span>
+                    <h4 class="font-bold text-gray-800 text-sm mb-1 line-clamp-2">{{ pub.title }}</h4>
+                    <p class="text-xs text-gray-500 mb-1">{{ pub.peneliti }}</p>
+                    <div class="text-[10px] text-gray-400">
+                        <i class="fas fa-external-link-alt mr-1 text-primary-400"></i> Publikasi Terbaru
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </section>

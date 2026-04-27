@@ -28,10 +28,17 @@ class ProspekKeunggulanAdmin(admin.ModelAdmin):
 
 @admin.register(Dosen)
 class DosenAdmin(admin.ModelAdmin):
-    list_display = ['nama', 'nidn', 'kategori', 'pendidikan', 'is_active']
+    list_display = ['nama', 'nidn', 'kategori', 'pendidikan', 'is_active', 'action_tarik_sinta']
     list_filter = ['kategori', 'is_active']
     search_fields = ['nama', 'nidn', 'email', 'bidang_keahlian']
     list_editable = ['is_active']
+
+    def action_tarik_sinta(self, obj):
+        from django.utils.html import format_html
+        if obj.sinta_link:
+            return format_html('<a class="button" style="background-color: #28a745; color: white; padding: 5px 10px; border-radius: 4px;" href="/admin-tools/tarik-sinta/{}/">Tarik Data Sinta</a>', obj.id)
+        return "-"
+    action_tarik_sinta.short_description = 'Aksi Sinta'
 
 
 @admin.register(DocumentCategory)
@@ -96,8 +103,8 @@ class PrestasiAdmin(admin.ModelAdmin):
 
 @admin.register(Penelitian)
 class PenelitianAdmin(admin.ModelAdmin):
-    list_display = ['title', 'jenis', 'year', 'peneliti']
-    list_filter = ['jenis', 'year']
+    list_display = ['title', 'jenis', 'tipe_peneliti', 'year', 'peneliti']
+    list_filter = ['jenis', 'tipe_peneliti', 'year']
     search_fields = ['title', 'peneliti', 'abstrak']
 
 

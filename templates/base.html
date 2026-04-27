@@ -164,7 +164,7 @@
             <div class="flex items-center justify-between py-4">
                 <!-- Logo -->
                 <div class="flex items-center space-x-4">
-                    <img src="/media/logo-unh-smart.png" alt="Logo UNH" class="h-14 w-auto object-contain"
+                    <img src="{{ MEDIA_URL }}logo-unh-smart.png" alt="Logo UNH" class="h-14 w-auto object-contain"
                         onerror="this.style.display='none'">
                     <div>
                         <h1 class="text-xl font-bold">Sistem Informasi</h1>
@@ -179,6 +179,33 @@
                     <a href="{% url 'profile' %}"
                         class="hover:text-gold-300 transition {% if 'profile' in request.path %}text-gold-400 font-semibold{% endif %}">Profile
                         Prodi</a>
+
+                    <!-- Riset & Publikasi Dropdown -->
+                    <div class="relative group">
+                        <a href="#"
+                            class="hover:text-gold-300 transition {% if 'riset-publikasi' in request.path %}text-gold-400 font-semibold{% endif %} flex items-center">
+                            Riset & Publikasi <i
+                                class="fas fa-chevron-down ml-1 text-xs transition-transform group-hover:rotate-180"></i>
+                        </a>
+                        <div
+                            class="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 transform origin-top scale-95 group-hover:scale-100 divide-y divide-gray-100 overflow-hidden">
+                            <div class="py-1">
+                                <a href="{% url 'riset_publikasi' 'dosen' %}"
+                                    class="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition text-sm">
+                                    Dosen
+                                </a>
+                                <a href="{% url 'riset_publikasi' 'mahasiswa' %}"
+                                    class="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition text-sm">
+                                    Mahasiswa
+                                </a>
+                                <a href="{% url 'riset_publikasi' 'participant' %}"
+                                    class="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition text-sm">
+                                    Participant
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <a href="{% url 'akademik' %}"
                         class="hover:text-gold-300 transition {% if 'akademik' in request.path %}text-gold-400 font-semibold{% endif %}">Akademik</a>
 
@@ -244,6 +271,22 @@
                 <div class="flex flex-col space-y-3">
                     <a href="{% url 'home' %}" class="hover:text-gold-300 transition py-2">Home</a>
                     <a href="{% url 'profile' %}" class="hover:text-gold-300 transition py-2">Profile Prodi</a>
+
+                    <!-- Mobile Riset & Publikasi with Toggle -->
+                    <div>
+                        <button onclick="toggleMobileSubmenu('riset-sub')"
+                            class="w-full flex justify-between items-center hover:text-gold-300 transition py-2">
+                            Riset & Publikasi <i id="riset-sub-icon"
+                                class="fas fa-chevron-down text-sm transition-transform"></i>
+                        </button>
+                        <div id="riset-sub"
+                            class="hidden pl-4 flex flex-col space-y-1 mt-1 border-l-2 border-gold-400/30">
+                            <a href="{% url 'riset_publikasi' 'dosen' %}" class="hover:text-gold-300 transition py-2 text-sm">Dosen</a>
+                            <a href="{% url 'riset_publikasi' 'mahasiswa' %}" class="hover:text-gold-300 transition py-2 text-sm">Mahasiswa</a>
+                            <a href="{% url 'riset_publikasi' 'participant' %}" class="hover:text-gold-300 transition py-2 text-sm">Participant</a>
+                        </div>
+                    </div>
+
                     <a href="{% url 'akademik' %}" class="hover:text-gold-300 transition py-2">Akademik</a>
 
                     <!-- Mobile Kurikulum with Toggle -->
@@ -319,10 +362,10 @@
                 <div>
                     <h3 class="text-lg font-bold mb-4 text-gold-400">Layanan</h3>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-gold-400 transition">SIAKAD</a></li>
-                        <li><a href="#" class="hover:text-gold-400 transition">V-Class</a></li>
-                        <li><a href="#" class="hover:text-gold-400 transition">Open Journal System</a></li>
-                        <li><a href="#" class="hover:text-gold-400 transition">Laboratorium</a></li>
+                        <li><a href="https://siakad.unh.ac.id" target="_blank" class="hover:text-gold-400 transition">SIAKAD</a></li>
+                        <li><a href="https://v-class.unh.ac.id" target="_blank" class="hover:text-gold-400 transition">V-Class</a></li>
+                        <li><a href="https://ojs.unh.ac.id" target="_blank" class="hover:text-gold-400 transition">Open Journal System</a></li>
+                        <li><a href="{% url 'layanan' %}" class="hover:text-gold-400 transition">Pusat Layanan</a></li>
                     </ul>
                 </div>
 
@@ -330,14 +373,14 @@
                 <div>
                     <h3 class="text-lg font-bold mb-4 text-gold-400">Kontak</h3>
                     <ul class="space-y-2 text-sm">
-                        <li><i class="fas fa-envelope mr-2"></i> sistem.informasi@unh.ac.id</li>
-                        <li><i class="fas fa-phone mr-2"></i> +62 xxx xxxx xxxx</li>
+                        <li><i class="fas fa-envelope mr-2"></i> si@unh.ac.id</li>
+                        <li><i class="fas fa-phone mr-2"></i> +62 741 61611</li>
                         <li><i class="fas fa-map-marker-alt mr-2"></i> Jambi, Indonesia</li>
                     </ul>
                     <div class="flex space-x-4 mt-4">
-                        <a href="#" class="text-2xl hover:text-gold-400 transition"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-2xl hover:text-gold-400 transition"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-2xl hover:text-gold-400 transition"><i class="fab fa-youtube"></i></a>
+                        <a href="https://facebook.com/unhjambi" target="_blank" class="text-2xl hover:text-gold-400 transition"><i class="fab fa-facebook"></i></a>
+                        <a href="https://instagram.com/si_unh" target="_blank" class="text-2xl hover:text-gold-400 transition"><i class="fab fa-instagram"></i></a>
+                        <a href="https://youtube.com/@unhtv" target="_blank" class="text-2xl hover:text-gold-400 transition"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
             </div>

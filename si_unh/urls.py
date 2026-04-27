@@ -12,6 +12,7 @@ urlpatterns = [
     # Public URLs
     path('', views.home, name='home'),
     path('profile/', views.profile, name='profile'),
+    path('riset-publikasi/<str:tipe>/', views.riset_publikasi, name='riset_publikasi'),
     path('akademik/', views.akademik, name='akademik'),
     path('kurikulum/', views.kurikulum, name='kurikulum'),
     path('akreditasi/', views.akreditasi, name='akreditasi'),
@@ -25,6 +26,7 @@ urlpatterns = [
     path('survey/kurikulum/stats/', views.kurikulum_stats_view, name='kurikulum_stats_view'),
     path('survey/vmts/export/', views.export_vmts_excel, name='export_vmts_excel'),
     path('survey/vmts/stats/', views.vmts_stats_view, name='vmts_stats_view'),
+    path('submit-publikasi/', views.submit_publikasi, name='submit_publikasi'),
     path('media-informasi/', views.media_informasi, name='media_informasi'),
     
     # News & Documents
@@ -42,6 +44,8 @@ urlpatterns = [
     
     # Admin Tools
     path('admin-tools/import-jadwal/', views.import_jadwal_excel, name='import_jadwal_excel'),
+    path('admin-tools/import-penelitian/', views.import_penelitian, name='import_penelitian'),
+    path('admin-tools/tarik-sinta/<int:dosen_id>/', views.tarik_sinta, name='tarik_sinta'),
 ]
 
 if settings.DEBUG:

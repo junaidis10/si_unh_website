@@ -4,11 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.http import FileResponse, Http404, HttpResponse
-from django.db.models import Q
+from django.db.models import Q, Avg, Count
 from .models import *
 import os
+import requests
 import pandas as pd
-from django.db.models import Avg, Count
+from bs4 import BeautifulSoup
 import openpyxl
 
 def home(request):
@@ -66,6 +67,25 @@ def profile(request):
         'prospek': prospek,
     }
     return render(request, 'profile.html', context)
+
+
+def riset_publikasi(request, tipe='dosen'):
+    """Halaman Riset & Publikasi"""
+    penelitian_qs = Penelitian.objects.filter(tipe_peneliti=tipe).order_by('peneliti', '-year', '-created_at')
+    
+    penelitian_by_dosen = {}
+    for p in penelitian_qs:
+        nama = p.peneliti if p.peneliti else "Peneliti Lainnya"
+        if nama not in penelitian_by_dosen:
+            penelitian_by_dosen[nama] = []
+        penelitian_by_dosen[nama].append(p)
+
+    context = {
+        'penelitian_by_dosen': penelitian_by_dosen,
+        'tipe_peneliti': tipe,
+        'tipe_display': dict(Penelitian.TIPE_PENELITI_CHOICES).get(tipe, tipe).title()
+    }
+    return render(request, 'riset_publikasi.html', context)
 
 
 def akademik(request):
@@ -214,6 +234,180 @@ def kurikulum(request):
     }
     return render(request, 'kurikulum.html', context)
 
+
+import requests
+from bs4 import BeautifulSoup
+
+@staff_member_required
+def import_penelitian(request):
+    """Import data penelitian dari file Excel"""
+    if request.method == 'POST':
+        excel_file = request.FILES.get('excel_file')
+        tipe_peneliti = request.POST.get('tipe_peneliti', 'dosen')
+        clear_old = request.POST.get('clear_old')
+
+        if not excel_file:
+            messages.error(request, 'Silakan pilih file Excel.')
+            return redirect('import_penelitian')
+
+        if not excel_file.name.endswith(('.xlsx', '.xls')):
+            messages.error(request, 'Format file tidak didukung. Gunakan file .xlsx atau .xls')
+            return redirect('import_penelitian')
+
+        try:
+            wb = openpyxl.load_workbook(excel_file, read_only=True)
+            ws = wb.active
+
+            headers = []
+            for cell in ws[1]:
+                val = str(cell.value or '').strip().lower()
+                headers.append(val)
+
+            col_map = {}
+            for idx, h in enumerate(headers):
+                if 'judul' in h: col_map['title'] = idx
+                elif 'jenis' in h: col_map['jenis'] = idx
+                elif 'peneliti' in h or 'author' in h: col_map['peneliti'] = idx
+                elif 'tahun' in h or 'year' in h: col_map['year'] = idx
+                elif 'abstrak' in h or 'abstract' in h: col_map['abstrak'] = idx
+                elif 'link' in h or 'url' in h: col_map['link'] = idx
+
+            required = ['title', 'year', 'peneliti']
+            missing = [k for k in required if k not in col_map]
+            if missing:
+                messages.error(request, f'Kolom wajib tidak ditemukan: {", ".join(missing)}. Header Excel Anda: {", ".join(headers)}')
+                return redirect('import_penelitian')
+
+            if clear_old:
+                deleted_count = Penelitian.objects.filter(tipe_peneliti=tipe_peneliti).delete()[0]
+                messages.info(request, f'{deleted_count} data lama dihapus.')
+
+            items_to_create = []
+            row_count = 0
+            for row in ws.iter_rows(min_row=2, values_only=True):
+                if not row or not row[col_map['title']]:
+                    continue
+                    
+                title = str(row[col_map['title']]).strip()
+                year = row[col_map['year']]
+                try: year = int(year)
+                except: year = 2025
+                
+                peneliti = str(row[col_map['peneliti']] or '').strip()
+                abstrak = str(row[col_map.get('abstrak', -1)] or '') if 'abstrak' in col_map and col_map['abstrak'] < len(row) else ''
+                link = str(row[col_map.get('link', -1)] or '') if 'link' in col_map and col_map['link'] < len(row) else ''
+                jenis_val = str(row[col_map.get('jenis', -1)] or '').strip().lower() if 'jenis' in col_map and col_map['jenis'] < len(row) else 'penelitian'
+                if 'pengabdian' in jenis_val or 'pkm' in jenis_val:
+                    jenis = 'pkm'
+                elif 'publikasi' in jenis_val or 'jurnal' in jenis_val or 'artikel' in jenis_val:
+                    jenis = 'publikasi'
+                elif 'buku' in jenis_val or 'book' in jenis_val:
+                    jenis = 'buku'
+                else:
+                    jenis = 'penelitian'
+
+                items_to_create.append(Penelitian(
+                    title=title,
+                    jenis=jenis,
+                    tipe_peneliti=tipe_peneliti,
+                    peneliti=peneliti,
+                    year=year,
+                    abstrak=abstrak,
+                    link=link
+                ))
+                row_count += 1
+
+            if items_to_create:
+                Penelitian.objects.bulk_create(items_to_create)
+                messages.success(request, f'✅ Berhasil mengimpor {row_count} data publikasi/penelitian.')
+            else:
+                messages.warning(request, 'Tidak ada data valid yang ditemukan dalam file Excel.')
+            
+            return redirect('import_penelitian')
+            
+        except Exception as e:
+            messages.error(request, f'Gagal memproses file: {str(e)}')
+            return redirect('import_penelitian')
+
+    return render(request, 'admin/import_penelitian.html')
+
+
+@staff_member_required
+def tarik_sinta(request, dosen_id):
+    """Scraping sederhana profil Sinta untuk mengambil daftar publikasi"""
+    dosen = get_object_or_404(Dosen, id=dosen_id)
+    sinta_link = dosen.sinta_link
+    
+    if not sinta_link:
+        messages.error(request, f'Dosen {dosen.nama} tidak memiliki Link Sinta yang valid.')
+        return redirect('admin:core_dosen_change', dosen.id)
+        
+    try:
+        # Hapus trailing slash jika ada
+        if sinta_link.endswith('/'):
+            sinta_link = sinta_link[:-1]
+            
+        urls_to_try = [
+            (sinta_link + '/?view=googlescholar', 'publikasi'),
+            (sinta_link + '/?view=garuda', 'publikasi'),
+            (sinta_link + '/?view=books', 'buku'),
+            (sinta_link, 'publikasi')
+        ]
+        
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+        
+        count = 0
+        
+        for url, default_jenis in urls_to_try:
+            try:
+                response = requests.get(url, headers=headers, timeout=15)
+                if response.status_code == 200:
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    papers = soup.find_all('div', class_='ar-list-item')
+                    
+                    for p in papers:
+                        title_elem = p.find('div', class_='ar-title')
+                        if not title_elem: continue
+                        
+                        a_tag = title_elem.find('a')
+                        if not a_tag: continue
+                        title = a_tag.text.strip()
+                        if not title: continue
+                        
+                        # Ekstrak Tahun
+                        year_elem = p.find('a', class_='ar-year')
+                        year = 2025
+                        if year_elem:
+                            match = re.search(r'\d{4}', year_elem.text)
+                            if match:
+                                year = int(match.group())
+                        
+                        # Cek duplikat
+                        if not Penelitian.objects.filter(title__iexact=title, peneliti__icontains=dosen.nama).exists():
+                            Penelitian.objects.create(
+                                title=title,
+                                jenis=default_jenis,
+                                tipe_peneliti='dosen',
+                                peneliti=dosen.nama,
+                                year=year,
+                                abstrak='Data ditarik otomatis dari Sinta Kemdiktisaintek.',
+                                link=sinta_link
+                            )
+                            count += 1
+            except:
+                continue
+                    
+        if count > 0:
+            messages.success(request, f'✅ Berhasil menarik {count} data baru dari Sinta untuk {dosen.nama}.')
+        else:
+            messages.info(request, f'Tidak ada data baru yang ditemukan di Sinta untuk {dosen.nama}.')
+            
+    except Exception as e:
+        messages.error(request, f'Terjadi kesalahan saat memproses Sinta: {str(e)}')
+        
+    return redirect('admin:core_dosen_change', dosen.id)
 
 @staff_member_required
 def import_jadwal_excel(request):
@@ -390,6 +584,10 @@ def layanan(request):
     penelitian = Penelitian.objects.all()[:10]
     job_careers = JobCareer.objects.filter(is_active=True)[:10]
     
+    # Library & Publication Data
+    lecturer_books = Penelitian.objects.filter(jenis='buku').order_by('-year', '-created_at')[:4]
+    lecturer_publications = Penelitian.objects.filter(jenis='publikasi').order_by('-year', '-created_at')[:6]
+    
     # Dokumen Pembimbing
     try:
         pa_cat = DocumentCategory.objects.get(slug='pembimbing-akademik')
@@ -413,6 +611,8 @@ def layanan(request):
         'links': links,
         'penelitian': penelitian,
         'job_careers': job_careers,
+        'lecturer_books': lecturer_books,
+        'lecturer_publications': lecturer_publications,
         'pa_docs': pa_docs,
         'ps_docs': ps_docs,
         'psk_docs': psk_docs,
@@ -600,6 +800,34 @@ def survey_view(request):
         return redirect('layanan')
         
     return render(request, 'survey.html')
+
+def submit_publikasi(request):
+    """Halaman Upload Publikasi Jurnal (Dosen & Mahasiswa)"""
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        peneliti = request.POST.get('peneliti')
+        tipe_peneliti = request.POST.get('tipe_peneliti', 'dosen')
+        jenis_publikasi = request.POST.get('jenis_publikasi', 'publikasi')
+        year = request.POST.get('year')
+        link = request.POST.get('link')
+        abstrak = request.POST.get('abstrak', 'Publikasi diunggah melalui formulir layanan.')
+        
+        try:
+            Penelitian.objects.create(
+                title=title,
+                peneliti=peneliti,
+                tipe_peneliti=tipe_peneliti,
+                jenis='publikasi', # Tetap publikasi, tapi detailnya ada di title atau jenis_publikasi jika kita mau simpan di field lain
+                year=int(year) if year else 2025,
+                link=link,
+                abstrak=f"[{jenis_publikasi.upper()}] {abstrak}"
+            )
+            messages.success(request, 'Berhasil mengunggah data publikasi! Terima kasih atas kontribusi Anda.')
+            return redirect('layanan')
+        except Exception as e:
+            messages.error(request, f'Gagal mengunggah data: {str(e)}')
+            
+    return render(request, 'submit_publikasi.html')
 
 def submit_survey_lulusan(request):
     """Halaman Survei Kepuasan Pengguna Lulusan"""
