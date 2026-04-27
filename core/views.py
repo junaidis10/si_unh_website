@@ -697,9 +697,9 @@ def layanan(request):
     penelitian = Penelitian.objects.all()[:10]
     job_careers = JobCareer.objects.filter(is_active=True)[:10]
     
-    # Library & Publication Data
-    lecturer_books = Penelitian.objects.filter(jenis='buku').order_by('-year', '-created_at')[:4]
-    lecturer_publications = Penelitian.objects.filter(jenis='publikasi').order_by('-year', '-created_at')[:6]
+    # Library & Publication Data (Synchronized with SINTA/Dosen data)
+    lecturer_books = Penelitian.objects.filter(jenis='buku', tipe_peneliti='dosen').order_by('-year', '-created_at')[:4]
+    lecturer_publications = Penelitian.objects.filter(jenis='publikasi', tipe_peneliti='dosen').order_by('-year', '-created_at')[:6]
     
     # Dokumen Pembimbing
     try:
