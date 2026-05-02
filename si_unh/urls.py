@@ -46,6 +46,9 @@ urlpatterns = [
     path('admin-tools/import-jadwal/', views.import_jadwal_excel, name='import_jadwal_excel'),
     path('admin-tools/import-penelitian/', views.import_penelitian, name='import_penelitian'),
     path('admin-tools/tarik-sinta/<int:dosen_id>/', views.tarik_sinta, name='tarik_sinta'),
+    
+    # Layanan Akademik
+    path('layanan-akademik/', include('layanan_akademik.urls')),
 ]
 
 if settings.DEBUG:

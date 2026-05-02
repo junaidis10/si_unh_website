@@ -31,113 +31,124 @@
     <div class="container mx-auto px-4">
 
         {% if penelitian_by_dosen %}
-        {% for nama_dosen, penelitian_list in penelitian_by_dosen.items %}
-        <div class="mb-16 animate-fade-in">
-            <div class="flex items-center mb-8 border-b border-gray-200 pb-4">
-                <div
-                    class="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl shadow-lg flex items-center justify-center text-white font-bold text-xl mr-4 transform -rotate-3 group-hover:rotate-0 transition-transform">
-                    <i class="fas fa-user-graduate"></i>
-                </div>
-                <h2 class="text-3xl font-bold text-gray-800">
-                    {{ nama_dosen }}
-                    <span class="block text-sm font-normal text-gray-500 mt-1">
-                        {{ penelitian_list|length }} Publikasi/Penelitian
-                    </span>
-                </h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {% for item in penelitian_list %}
-                <div
-                    class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col h-full transform transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary-900/20 hover:border-primary-200 group relative">
-                    <!-- Decorative top line -->
-                    <div
-                        class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-400 to-gold-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left">
-                    </div>
-
-                    <div class="p-6 flex-grow flex flex-col">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex flex-wrap gap-2">
-                                {% if item.jenis == 'penelitian' %}
-                                <span class="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-semibold border border-purple-100 group-hover:bg-purple-100 transition-colors">
-                                    <i class="fas fa-microscope mr-1"></i> {{ item.get_jenis_display }}
+        <div class="max-w-6xl mx-auto space-y-6">
+            {% for nama_dosen, data in penelitian_by_dosen.items %}
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-500 hover:shadow-xl hover:border-primary-200 group">
+                <!-- Lecturer Header (Accordion Toggle) -->
+                <button onclick="toggleAccordion('content-{{ forloop.counter }}', 'icon-{{ forloop.counter }}')" 
+                        class="w-full flex items-center justify-between p-6 lg:p-8 text-left focus:outline-none bg-white hover:bg-gray-50/50 transition-colors">
+                    <div class="flex items-center">
+                        <div class="w-16 h-16 rounded-2xl shadow-lg flex items-center justify-center overflow-hidden mr-5 transform group-hover:scale-110 transition-transform duration-500 bg-gray-100 border-2 border-white group-hover:border-primary-100 transition-all">
+                            {% if data.dosen.photo %}
+                                <img src="{{ data.dosen.photo.url }}" alt="{{ nama_dosen }}" class="w-full h-full object-cover">
+                            {% else %}
+                                <div class="w-full h-full bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center text-white">
+                                    <i class="fas fa-user-tie text-2xl"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-gray-900 group-hover:text-primary-700 transition-colors">
+                                {{ nama_dosen }}
+                            </h2>
+                            <div class="flex items-center mt-1 space-x-4">
+                                <span class="text-sm font-medium text-primary-600 flex items-center bg-primary-50 px-3 py-1 rounded-full">
+                                    <i class="fas fa-layer-group mr-2"></i> {{ data.list|length }} Karya Ilmiah
                                 </span>
-                                {% elif item.jenis == 'pkm' %}
-                                <span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-semibold border border-green-100 group-hover:bg-green-100 transition-colors">
-                                    <i class="fas fa-hands-helping mr-1"></i> {{ item.get_jenis_display }}
-                                </span>
-                                {% elif item.jenis == 'publikasi' %}
-                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold border border-blue-100 group-hover:bg-blue-100 transition-colors">
-                                    <i class="fas fa-book mr-1"></i> {{ item.get_jenis_display }}
-                                </span>
-                                {% elif item.jenis == 'buku' %}
-                                <span class="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-semibold border border-orange-100 group-hover:bg-orange-100 transition-colors">
-                                    <i class="fas fa-atlas mr-1"></i> {{ item.get_jenis_display }}
-                                </span>
-                                {% endif %}
-                                {% if 'sinta' in item.link %}
-                                <span
-                                    class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold border border-blue-100 group-hover:bg-blue-100 transition-colors">
-                                    <i class="fas fa-globe mr-1"></i> Sinta
+                                {% if data.dosen.nidn %}
+                                <span class="text-xs text-gray-400 font-medium tracking-wide">
+                                    NIDN: {{ data.dosen.nidn }}
                                 </span>
                                 {% endif %}
                             </div>
-                            <span
-                                class="text-gray-500 text-sm font-bold bg-gray-50 px-2 py-1 rounded-lg group-hover:text-primary-600 transition-colors ml-2 whitespace-nowrap">
-                                <i class="far fa-calendar-alt mr-1"></i> {{ item.year }}
-                            </span>
                         </div>
+                    </div>
+                    <div id="icon-{{ forloop.counter }}" class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 transition-all duration-500 transform group-hover:border-primary-300 group-hover:text-primary-500">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </button>
 
-                        <h3
-                            class="text-xl font-bold text-gray-800 mb-3 line-clamp-2 group-hover:text-primary-700 transition-colors">
-                            {{ item.title }}
-                        </h3>
+                <!-- Accordion Content -->
+                <div id="content-{{ forloop.counter }}" class="max-h-0 overflow-hidden transition-all duration-700 ease-in-out opacity-0">
+                    <div class="p-8 lg:p-10 bg-gray-50/30 border-t border-gray-50">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {% for item in data.list %}
+                            <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col h-full transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-primary-100 group/card relative">
+                                <div class="p-6 flex-grow flex flex-col">
+                                    <div class="flex items-center justify-between mb-4">
+                                        {% if item.jenis == 'penelitian' %}
+                                        <span class="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-[10px] font-bold uppercase tracking-wider border border-purple-100">
+                                            <i class="fas fa-microscope mr-1"></i> Peneliti
+                                        </span>
+                                        {% elif item.jenis == 'pkm' %}
+                                        <span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold uppercase tracking-wider border border-green-100">
+                                            <i class="fas fa-hands-helping mr-1"></i> PKM
+                                        </span>
+                                        {% elif item.jenis == 'publikasi' %}
+                                        <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] font-bold uppercase tracking-wider border border-blue-100">
+                                            <i class="fas fa-journal-whills mr-1"></i> Jurnal
+                                        </span>
+                                        {% elif item.jenis == 'buku' %}
+                                        <span class="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-[10px] font-bold uppercase tracking-wider border border-orange-100">
+                                            <i class="fas fa-book mr-1"></i> Buku
+                                        </span>
+                                        {% endif %}
+                                        <span class="text-gray-400 text-xs font-bold">{{ item.year }}</span>
+                                    </div>
 
-                        <div class="text-gray-600 text-sm mb-6 line-clamp-3 flex-grow leading-relaxed">
-                            {{ item.abstrak|safe|striptags|default:"Abstrak tidak tersedia." }}
-                        </div>
+                                    <h3 class="text-base font-bold text-gray-800 mb-3 line-clamp-3 group-hover/card:text-primary-700 transition-colors">
+                                        {{ item.title }}
+                                    </h3>
 
-                        <div class="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center">
-                            {% if item.file %}
-                            <a href="{{ item.file.url }}" target="_blank"
-                                class="text-primary-600 hover:text-primary-800 font-bold text-sm transition flex items-center bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-lg w-full justify-center group/btn">
-                                <i
-                                    class="fas fa-file-pdf mr-2 transform group-hover/btn:-translate-y-1 transition-transform"></i>
-                                Baca Dokumen
-                            </a>
-                            {% elif item.link %}
-                            {% if 'sinta' in item.link %}
-                            <a href="{{ item.link }}" target="_blank"
-                                class="text-blue-600 hover:text-white hover:bg-blue-600 font-bold text-sm transition-all duration-300 flex items-center bg-blue-50 px-4 py-2 rounded-lg w-full justify-center shadow-sm hover:shadow-md group/btn">
-                                <i
-                                    class="fas fa-external-link-alt mr-2 transform group-hover/btn:-translate-y-1 transition-transform"></i>
-                                Sources Sinta Kemdiktisaintek
-                            </a>
-                            {% else %}
-                            <a href="{{ item.link }}" target="_blank"
-                                class="text-primary-600 hover:text-white hover:bg-primary-600 font-bold text-sm transition-all duration-300 flex items-center bg-primary-50 px-4 py-2 rounded-lg w-full justify-center shadow-sm hover:shadow-md group/btn">
-                                <i
-                                    class="fas fa-external-link-alt mr-2 transform group-hover/btn:-translate-y-1 transition-transform"></i>
-                                Link Publikasi
-                            </a>
-                            {% endif %}
-                            {% else %}
-                            <span class="text-gray-400 text-sm italic w-full text-center bg-gray-50 py-2 rounded-lg">
-                                <i class="fas fa-ban mr-1"></i> Tautan tidak tersedia
-                            </span>
-                            {% endif %}
+                                    <div class="mt-auto pt-4 flex justify-end">
+                                        {% if item.link or item.file %}
+                                        <a href="{% if item.file %}{{ item.file.url }}{% else %}{{ item.link }}{% endif %}" target="_blank"
+                                           class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-primary-600 hover:text-white transition-all duration-300">
+                                            <i class="fas fa-external-link-alt text-sm"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
-                {% endfor %}
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+
+        <script>
+            function toggleAccordion(contentId, iconId) {
+                const content = document.getElementById(contentId);
+                const icon = document.getElementById(iconId);
+                
+                if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                    content.style.maxHeight = '0px';
+                    content.style.opacity = '0';
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    // Close others (optional, comment out if you want multiple open)
+                    /*
+                    document.querySelectorAll('[id^="content-"]').forEach(el => {
+                        el.style.maxHeight = '0px';
+                        el.style.opacity = '0';
+                    });
+                    document.querySelectorAll('[id^="icon-"]').forEach(el => {
+                        el.style.transform = 'rotate(0deg)';
+                    });
+                    */
+                    
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    content.style.opacity = '1';
+                    icon.style.transform = 'rotate(180deg)';
+                    icon.classList.add('text-primary-600', 'border-primary-400');
+                }
+            }
+        </script>
         {% else %}
-        <div
-            class="bg-white rounded-2xl shadow-lg p-12 text-center animate-fade-in border border-gray-100 max-w-2xl mx-auto">
-            <div
-                class="w-24 h-24 mx-auto bg-primary-50 rounded-full flex items-center justify-center mb-6 shadow-inner">
+        <div class="bg-white rounded-2xl shadow-lg p-12 text-center border border-gray-100 max-w-2xl mx-auto">
+            <div class="w-24 h-24 mx-auto bg-primary-50 rounded-full flex items-center justify-center mb-6 shadow-inner">
                 <i class="fas fa-search text-4xl text-primary-400"></i>
             </div>
             <h3 class="text-2xl font-bold text-gray-800 mb-3">Belum Ada Data</h3>

@@ -74,6 +74,7 @@ class Dosen(models.Model):
         ('luar_biasa', 'Dosen Luar Biasa'),
     ]
     
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='dosen_profile')
     nidn = models.CharField(max_length=20, unique=True)
     nama = models.CharField(max_length=100)
     kategori = models.CharField(max_length=28, choices=KATEGORI_CHOICES, default='tetap')
@@ -94,6 +95,30 @@ class Dosen(models.Model):
     
     def __str__(self):
         return f'{self.nama} - {self.nidn}'
+
+    def save(self, *args, **kwargs):
+        # Auto-create User if not exists
+        if not self.user and self.nidn:
+            from django.contrib.auth.models import User, Group
+            username = self.nidn
+            user, created = User.objects.get_or_create(
+                username=username,
+                defaults={
+                    'first_name': self.nama[:30],
+                    'email': self.email,
+                    'is_staff': True  # Agar bisa login ke Admin
+                }
+            )
+            if created:
+                user.set_password(self.nidn) # Default password: NIDN
+                user.save()
+            self.user = user
+            
+            # Tambahkan ke grup Dosen
+            group, _ = Group.objects.get_or_create(name='Dosen')
+            user.groups.add(group)
+            
+        super().save(*args, **kwargs)
 
 
 class DocumentCategory(models.Model):
@@ -250,6 +275,7 @@ class Penelitian(models.Model):
         ('participant', 'Participant'),
     ]
     
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='penelitian_owned', verbose_name="Pemilik Data")
     title = models.CharField(max_length=300, verbose_name="Judul Karya")
     jenis = models.CharField(max_length=20, choices=JENIS_CHOICES, verbose_name="Jenis Karya")
     tipe_peneliti = models.CharField(max_length=20, choices=TIPE_PENELITI_CHOICES, default='dosen', verbose_name="Kategori Peneliti")

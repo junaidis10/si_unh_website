@@ -77,12 +77,21 @@ def riset_publikasi(request, tipe='dosen'):
     """Halaman Riset & Publikasi"""
     penelitian_qs = Penelitian.objects.filter(tipe_peneliti=tipe).order_by('peneliti', '-year', '-created_at')
     
+    # Ambil data dosen untuk mapping foto/profile
+    all_dosen = Dosen.objects.filter(is_active=True)
+    dosen_map = {d.nama.strip().lower(): d for d in all_dosen}
+    
     penelitian_by_dosen = {}
     for p in penelitian_qs:
-        nama = p.peneliti if p.peneliti else "Peneliti Lainnya"
+        nama = p.peneliti.strip() if p.peneliti else "Peneliti Lainnya"
+        nama_key = nama.lower()
+        
         if nama not in penelitian_by_dosen:
-            penelitian_by_dosen[nama] = []
-        penelitian_by_dosen[nama].append(p)
+            penelitian_by_dosen[nama] = {
+                'dosen': dosen_map.get(nama_key),
+                'list': []
+            }
+        penelitian_by_dosen[nama]['list'].append(p)
 
     context = {
         'penelitian_by_dosen': penelitian_by_dosen,

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Import Mahasiswa - Layanan Akademik{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-4">
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
+                <div class="bg-primary-600 p-8 text-white">
+                    <h1 class="text-2xl font-bold mb-2">Import Data Mahasiswa</h1>
+                    <p class="text-primary-100 text-sm">Unggah file Excel untuk menambah data mahasiswa secara massal.</p>
+                </div>
+                
+                <div class="p-8">
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8 rounded-r-lg">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700 font-medium">Format Excel yang didukung:</p>
+                                <ul class="text-xs text-blue-600 mt-2 list-disc ml-4 space-y-1">
+                                    <li>Kolom wajib: <strong>NIM, Nama, Program Studi, Angkatan</strong></li>
+                                    <li>Password default mahasiswa adalah <strong>NIM</strong> mereka.</li>
+                                    <li>Jika NIM sudah ada, data akan diperbarui (Update).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data" class="space-y-6">
+                        {% csrf_token %}
+                        <div class="border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center hover:border-primary-400 transition-colors group">
+                            <input type="file" name="file" id="file" class="hidden" accept=".xlsx, .xls">
+                            <label for="file" class="cursor-pointer">
+                                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-50 transition-colors">
+                                    <i class="fas fa-file-excel text-2xl text-gray-400 group-hover:text-primary-500"></i>
+                                </div>
+                                <p class="text-gray-600 font-medium" id="file-name">Pilih file Excel (.xlsx)</p>
+                                <p class="text-xs text-gray-400 mt-1">Klik di sini untuk menelusuri file</p>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-4">
+                            <a href="/Js0312yA11/layanan_akademik/mahasiswa/" class="text-gray-500 text-sm font-medium hover:text-gray-700">
+                                <i class="fas fa-arrow-left mr-1"></i> Kembali ke Daftar
+                            </a>
+                            <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white px-10 py-3 rounded-full font-bold shadow-lg shadow-primary-100 transition-all">
+                                Mulai Import
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('file').onchange = function() {
+        if (this.files[0]) {
+            document.getElementById('file-name').innerText = this.files[0].name;
+            document.getElementById('file-name').className = 'text-primary-600 font-bold';
+        }
+    };
+</script>
+{% endblock %}

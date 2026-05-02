@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_tailwind',
     'core',
+    'layanan_akademik',
 ]
 
 MIDDLEWARE = [
@@ -65,11 +66,12 @@ DATABASES = {
         'NAME': config('DB_NAME', default='si_unh_db'),
         'USER': config('DB_USER', default='root'),
         'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default='localhost'),
+        'HOST': config('DB_HOST', default=''),
         'PORT': config('DB_PORT', default='3306'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
+            'unix_socket': '/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock',
         }
     }
 }

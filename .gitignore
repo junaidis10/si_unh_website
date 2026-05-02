@@ -37,3 +37,6 @@ Thumbs.db
 # Hanya ignore file temporary/cache
 media/.DS_Store
 media/**/.DS_Store
+
+# Scratch/Temporary
+scratch/

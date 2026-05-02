@@ -33,6 +33,19 @@ class DosenAdmin(admin.ModelAdmin):
     search_fields = ['nama', 'nidn', 'email', 'bidang_keahlian']
     list_editable = ['is_active']
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser or request.user.username in ['junaidisurya', 'ahmad husna ahadi']:
+            return qs
+        return qs.filter(user=request.user)
+
+    def has_change_permission(self, request, obj=None):
+        if not obj:
+            return True
+        if request.user.is_superuser or request.user.username in ['junaidisurya', 'ahmad husna ahadi']:
+            return True
+        return obj.user == request.user
+
     def action_tarik_sinta(self, obj):
         from django.utils.html import format_html
         if obj.sinta_link:
@@ -103,9 +116,27 @@ class PrestasiAdmin(admin.ModelAdmin):
 
 @admin.register(Penelitian)
 class PenelitianAdmin(admin.ModelAdmin):
-    list_display = ['title', 'jenis', 'tipe_peneliti', 'year', 'peneliti']
+    list_display = ['title', 'jenis', 'tipe_peneliti', 'year', 'peneliti', 'owner']
     list_filter = ['jenis', 'tipe_peneliti', 'year']
     search_fields = ['title', 'peneliti', 'abstrak']
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser or request.user.username in ['junaidisurya', 'ahmad husna ahadi']:
+            return qs
+        return qs.filter(owner=request.user)
+
+    def save_model(self, request, obj, form, change):
+        if not obj.owner:
+            obj.owner = request.user
+        super().save_model(request, obj, form, change)
+
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj)
+        if not (request.user.is_superuser or request.user.username in ['junaidisurya', 'ahmad husna ahadi']):
+            if 'owner' in fields:
+                fields.remove('owner')
+        return fields
 
 
 @admin.register(Akreditasi)

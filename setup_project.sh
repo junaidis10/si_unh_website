@@ -43,6 +43,9 @@ mkdir -p media/slides
 mkdir -p media/dosen
 mkdir -p media/news
 mkdir -p media/documents
+mkdir -p media/layanan_akademik/ta/proposal
+mkdir -p media/layanan_akademik/ta/skripsi
+mkdir -p media/layanan_akademik/kp_magang
 
 # 6. Creating __init__.py files
 echo "[6/7] Creating __init__.py files..."

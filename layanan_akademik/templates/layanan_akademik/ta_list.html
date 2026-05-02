@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Daftar Tugas Akhir - SI UNH{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Tugas Akhir Saya</h1>
+                <p class="text-gray-600">Manajemen pengajuan judul, proposal, dan skripsi.</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <a href="{% url 'layanan_akademik:ta_create' %}" class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-full font-bold transition shadow-lg">
+                    <i class="fas fa-plus mr-2"></i> Daftar Tugas Akhir Baru
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 border-b border-gray-100">
+                        <tr>
+                            <th class="px-6 py-4 font-bold text-gray-700 text-sm uppercase tracking-wider">Judul</th>
+                            <th class="px-6 py-4 font-bold text-gray-700 text-sm uppercase tracking-wider">Pembimbing</th>
+                            <th class="px-6 py-4 font-bold text-gray-700 text-sm uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-4 font-bold text-gray-700 text-sm uppercase tracking-wider">Tanggal Daftar</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        {% for ta in ta_list %}
+                        <tr class="hover:bg-gray-50/50 transition">
+                            <td class="px-6 py-6">
+                                <div class="font-bold text-gray-900 mb-1 max-w-md">"{{ ta.judul }}"</div>
+                                <div class="text-xs text-gray-500 font-medium">Semester: {{ ta.semester_mulai }}</div>
+                            </td>
+                            <td class="px-6 py-6">
+                                <div class="space-y-1">
+                                    <div class="text-sm"><span class="text-gray-400 font-bold text-[10px] uppercase w-16 inline-block">Utama:</span> <span class="font-semibold text-gray-700">{{ ta.pembimbing_utama|default:"Belum Diplot" }}</span></div>
+                                    <div class="text-sm"><span class="text-gray-400 font-bold text-[10px] uppercase w-16 inline-block">Pendamping:</span> <span class="text-gray-600">{{ ta.pembimbing_pendamping|default:"Belum Diplot" }}</span></div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-6">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest 
+                                    {% if ta.status == 'lulus' %}bg-green-100 text-green-700
+                                    {% elif ta.status == 'skripsi' %}bg-purple-100 text-purple-700
+                                    {% elif ta.status == 'proposal' %}bg-blue-100 text-blue-700
+                                    {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                                    {{ ta.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-6 text-sm text-gray-500">
+                                {{ ta.created_at|date:"d M Y" }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-6 py-12 text-center">
+                                <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
+                                    <i class="fas fa-file-contract text-2xl"></i>
+                                </div>
+                                <p class="text-gray-500 italic">Belum ada data Tugas Akhir.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

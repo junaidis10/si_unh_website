@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Jadwal Seminar & Sidang - SI UNH{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-table {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.4);
+    }
+    .table-header {
+        background: linear-gradient(to right, #7e22ce, #9333ea);
+        color: white;
+    }
+    .schedule-item {
+        transition: all 0.3s ease;
+    }
+    .schedule-item:hover {
+        background: rgba(126, 34, 206, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Jadwal Seminar & Sidang</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">Pantau jadwal seminar proposal dan sidang skripsi secara real-time. Pastikan Anda hadir tepat waktu di ruangan yang telah ditentukan.</p>
+        </div>
+
+        </div>
+
+        <!-- Seminar Proposal Table -->
+        <div class="mb-16">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mr-4 shadow-sm">
+                    <i class="fas fa-file-invoice text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Seminar Proposal</h2>
+            </div>
+            
+            <div class="glass-table shadow-xl overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="px-6 py-4 font-semibold text-sm uppercase tracking-wider">Mahasiswa</th>
+                            <th class="px-6 py-4 font-semibold text-sm uppercase tracking-wider">Tanggal & Waktu</th>
+                            <th class="px-6 py-4 font-semibold text-sm uppercase tracking-wider">Ruangan</th>
+                            <th class="px-6 py-4 font-semibold text-sm uppercase tracking-wider">Tim Penguji</th>
+                            <th class="px-6 py-4 font-semibold text-sm uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for item in seminar_proposal %}
+                        <tr class="schedule-item">
+                            <td class="px-6 py-5">
+                                <div class="font-bold text-gray-900">{{ item.tugas_akhir.mahasiswa.nama }}</div>
+                                <div class="text-xs text-gray-500 font-medium uppercase tracking-tighter">{{ item.tugas_akhir.mahasiswa.nim }}</div>
+                            </td>
+                            <td class="px-6 py-5">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-700 font-medium"><i class="far fa-calendar-alt mr-2 text-purple-400"></i>{{ item.tanggal }}</span>
+                                    <span class="text-gray-500 text-sm"><i class="far fa-clock mr-2 text-purple-400"></i>{{ item.jam }} WIB</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-5">
+                                <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-bold">{{ item.ruangan }}</span>
+                            </td>
+                            <td class="px-6 py-5">
+                                <div class="text-sm text-gray-600 space-y-1">
+                                    <div class="flex items-center"><span class="w-20 text-[10px] font-bold text-gray-400 uppercase">Ketua:</span> <span class="font-medium">{{ item.ketua.nama|default:"-" }}</span></div>
+                                    <div class="flex items-center"><span class="w-20 text-[10px] font-bold text-gray-400 uppercase">Utama:</span> <span class="font-medium">{{ item.penguji_utama|default:"-" }}</span></div>
+                                    <div class="flex items-center"><span class="w-20 text-[10px] font-bold text-gray-400 uppercase">{% if item.pembimbing_utama %}Pemb 1{% else %}Pemb{% endif %}:</span> <span class="font-medium">{{ item.pembimbing_utama|default:item.pembimbing_proposal|default:"-" }}</span></div>
+                                    {% if item.pembimbing_pendamping %}<div class="flex items-center"><span class="w-20 text-[10px] font-bold text-gray-400 uppercase">Pemb 2:</span> <span class="font-medium">{{ item.pembimbing_pendamping }}</span></div>{% endif %}
+                                    <div class="flex items-center italic text-[11px] text-gray-400"><span class="w-20 text-[10px] font-bold text-gray-400 uppercase not-italic">Notulis:</span> {{ item.notulis|default:"-" }}</div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-5">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest 
+                                    {% if item.hasil == 'lulus' %}bg-green-100 text-green-700
+                                    {% elif item.hasil == 'pending' %}bg-blue-100 text-blue-700
+                                    {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                                    {{ item.get_hasil_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-10 text-center text-gray-500 italic">Belum ada jadwal seminar proposal tersedia.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sidang Skripsi Table -->
+        <div>
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-gold-100 text-gold-600 rounded-2xl flex items-center justify-center mr-4 shadow-sm">
+                    <i class="fas fa-graduation-cap text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Sidang Skripsi</h2>
+            </div>
+            
+            <div class="glass-table shadow-xl overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gradient-to-right from-gold-600 to-gold-500 text-white" style="background: linear-gradient(to right, #d97706, #f59e0b);">
+                        <tr>
+                            <th class="px-6 py-4 font-semibold text-sm uppercase tracking-wider">Mahasiswa</th>
+                            <th class="px-6 py-4 font-semibold text-sm uppercase tracking-wider">Tanggal & Waktu</th>
+                            <th class="px-6 py-4 font-semibold text-sm uppercase tracking-wider">Ruangan</th>
+                            <th class="px-6 py-4 font-semibold text-sm uppercase tracking-wider">Tim Penguji</th>
+                            <th class="px-6 py-4 font-semibold text-sm uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for item in sidang_skripsi %}
+                        <tr class="schedule-item">
+                            <td class="px-6 py-5">
+                                <div class="font-bold text-gray-900">{{ item.tugas_akhir.mahasiswa.nama }}</div>
+                                <div class="text-xs text-gray-500 font-medium uppercase tracking-tighter">{{ item.tugas_akhir.mahasiswa.nim }}</div>
+                            </td>
+                            <td class="px-6 py-5">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-700 font-medium"><i class="far fa-calendar-alt mr-2 text-gold-400"></i>{{ item.tanggal }}</span>
+                                    <span class="text-gray-500 text-sm"><i class="far fa-clock mr-2 text-gold-400"></i>{{ item.jam }} WIB</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-5">
+                                <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-bold">{{ item.ruangan }}</span>
+                            </td>
+                            <td class="px-6 py-5">
+                                <div class="text-sm text-gray-600 space-y-1">
+                                    <div class="flex items-center"><span class="w-20 text-[10px] font-bold text-gray-400 uppercase">Ketua:</span> <span class="font-medium">{{ item.ketua.nama|default:"-" }}</span></div>
+                                    <div class="flex items-center"><span class="w-20 text-[10px] font-bold text-gray-400 uppercase">Utama:</span> <span class="font-medium">{{ item.penguji_utama|default:"-" }}</span></div>
+                                    <div class="flex items-center"><span class="w-20 text-[10px] font-bold text-gray-400 uppercase">Pemb 1:</span> <span class="font-medium">{{ item.pembimbing_utama|default:"-" }}</span></div>
+                                    <div class="flex items-center"><span class="w-20 text-[10px] font-bold text-gray-400 uppercase">Pemb 2:</span> <span class="font-medium">{{ item.pembimbing_pendamping|default:"-" }}</span></div>
+                                    <div class="flex items-center italic text-[11px] text-gray-400"><span class="w-20 text-[10px] font-bold text-gray-400 uppercase not-italic">Notulis:</span> {{ item.notulis|default:"-" }}</div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-5">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest 
+                                    {% if item.hasil == 'lulus' %}bg-green-100 text-green-700
+                                    {% elif item.hasil == 'pending' %}bg-blue-100 text-blue-700
+                                    {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                                    {{ item.get_hasil_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-10 text-center text-gray-500 italic">Belum ada jadwal sidang skripsi tersedia.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

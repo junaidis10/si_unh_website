@@ -13,19 +13,8 @@ if [ -f venv/bin/activate ]; then
     source venv/bin/activate
 fi
 
-echo "Starting Django development server..."
-echo ""
-echo "Website will be available at:"
-echo "http://127.0.0.1:8000/"
-echo ""
-echo "Admin panel:"
-echo "http://127.0.0.1:8000/Js0312yA11/"
-echo ""
-echo "Login:"
-echo "http://127.0.0.1:8000/dashboard/"
-echo ""
-echo "Press CTRL+C to stop the server"
-echo "=========================================="
-echo ""
+echo "Checking for database migrations..."
+python3 manage.py migrate
 
-python manage.py runserver
+echo "Starting Django development server..."
+python3 manage.py runserver
