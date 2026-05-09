@@ -1,0 +1,140 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Import Survei Kepuasan Lulusan dari Excel{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <h2 style="margin-bottom: 10px;">📥 Import Survei Kepuasan Lulusan dari File Excel/CSV</h2>
+
+    {% if messages %}
+    <div style="margin-bottom: 20px;">
+        {% for message in messages %}
+        <div class="msg-alert {% if message.tags %}{{ message.tags }}{% endif %}"
+            data-msg-type="{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% else %}info{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div style="background: #f3f4f6; padding: 20px; border-radius: 12px; border: 2px dashed #d1d5db; margin-bottom: 24px;">
+        <p style="margin-top: 0; color: #4b5563;">Gunakan formulir ini untuk mengimpor data survei kepuasan pengguna lulusan (stakeholder) dari file Excel atau CSV yang diunduh dari Google Forms.</p>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="margin-bottom: 16px;">
+                <label for="file" style="font-weight: bold; display: block; margin-bottom: 6px;">Pilih File (.xlsx, .xls, .csv):</label>
+                <input type="file" name="file" id="file" accept=".xlsx,.xls,.csv" required
+                    style="padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; width: 100%; background: white;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" name="skip_existing" value="1" checked>
+                    <span>Lewati data dengan email yang sudah ada</span>
+                </label>
+            </div>
+            <button type="submit" style="background: #0ea5e9; color: white; padding: 10px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">
+                🚀 Mulai Import
+            </button>
+        </form>
+    </div>
+
+    <div style="background: #ecfdf5; padding: 20px; border-radius: 12px; border: 1px solid #10b981;">
+        <h3 style="margin-top: 0; color: #065f46;">📋 Panduan Kolom Excel</h3>
+        <p style="color: #065f46; margin-bottom: 12px;">Sistem akan mencoba mengenali kolom berdasarkan kata kunci berikut:</p>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+                <tr style="background: #d1fae5;">
+                    <th style="border: 1px solid #10b981; padding: 8px; text-align: left;">Field Database</th>
+                    <th style="border: 1px solid #10b981; padding: 8px; text-align: left;">Kata Kunci Kolom Excel</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border: 1px solid #10b981; padding: 8px; font-weight: bold;">Email</td>
+                    <td style="border: 1px solid #10b981; padding: 8px;">e-mail, email, alamat email</td>
+                </tr>
+                <tr style="background: #f0fdf4;">
+                    <td style="border: 1px solid #10b981; padding: 8px; font-weight: bold;">Nama Responden</td>
+                    <td style="border: 1px solid #10b981; padding: 8px;">nama responden, nama lengkap</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #10b981; padding: 8px; font-weight: bold;">Nama Instansi</td>
+                    <td style="border: 1px solid #10b981; padding: 8px;">nama instansi, perusahaan, tempat kerja</td>
+                </tr>
+                <tr style="background: #f0fdf4;">
+                    <td style="border: 1px solid #10b981; padding: 8px; font-weight: bold;">Jabatan</td>
+                    <td style="border: 1px solid #10b981; padding: 8px;">jabatan, posisi</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #10b981; padding: 8px; font-weight: bold;">Integritas</td>
+                    <td style="border: 1px solid #10b981; padding: 8px;">integritas, etika, moral</td>
+                </tr>
+                <tr style="background: #f0fdf4;">
+                    <td style="border: 1px solid #10b981; padding: 8px; font-weight: bold;">Keahlian Bidang</td>
+                    <td style="border: 1px solid #10b981; padding: 8px;">keahlian bidang, kompetensi utama</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #10b981; padding: 8px; font-weight: bold;">Bahasa Inggris</td>
+                    <td style="border: 1px solid #10b981; padding: 8px;">bahasa inggris</td>
+                </tr>
+                <tr style="background: #f0fdf4;">
+                    <td style="border: 1px solid #10b981; padding: 8px; font-weight: bold;">Penggunaan IT</td>
+                    <td style="border: 1px solid #10b981; padding: 8px;">it, teknologi informasi</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #10b981; padding: 8px; font-weight: bold;">Komunikasi</td>
+                    <td style="border: 1px solid #10b981; padding: 8px;">komunikasi</td>
+                </tr>
+                <tr style="background: #f0fdf4;">
+                    <td style="border: 1px solid #10b981; padding: 8px; font-weight: bold;">Kerjasama Tim</td>
+                    <td style="border: 1px solid #10b981; padding: 8px;">kerjasama, tim, group</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #10b981; padding: 8px; font-weight: bold;">Pengembangan Diri</td>
+                    <td style="border: 1px solid #10b981; padding: 8px;">pengembangan diri, lifelong learning</td>
+                </tr>
+                <tr style="background: #f0fdf4;">
+                    <td style="border: 1px solid #10b981; padding: 8px; font-weight: bold;">Waktu Tunggu</td>
+                    <td style="border: 1px solid #10b981; padding: 8px;">waktu tunggu, waiting time</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="color: #065f46; font-size: 12px; margin-top: 10px;"><strong>Nilai yang Valid:</strong> Sangat Baik, Baik, Cukup, Kurang. (Untuk Waktu Tunggu: WT < 3, 6 <= WT <= 18, dll sesuai pilihan di form)</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrahead %}
+<style>
+    .msg-alert {
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.msg-alert').forEach(function(el) {
+        var t = el.getAttribute('data-msg-type');
+        if (t === 'success') {
+            el.style.background = '#d1fae5';
+            el.style.color = '#065f46';
+            el.style.border = '1px solid #6ee7b7';
+        } else if (t === 'error') {
+            el.style.background = '#fee2e2';
+            el.style.color = '#991b1b';
+            el.style.border = '1px solid #fca5a5';
+        } else {
+            el.style.background = '#dbeafe';
+            el.style.color = '#1e40af';
+            el.style.border = '1px solid #93c5fd';
+        }
+    });
+});
+</script>
+{% endblock %}

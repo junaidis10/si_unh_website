@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Akademik - SI UNH{% endblock %}
 
@@ -212,12 +213,6 @@
             </div>
             {% endif %}
             <h3 class="text-2xl font-bold text-center mb-1 leading-tight">{{ dosen.nama }}</h3>
-            {% if dosen.kategori == 'dtpr' %}
-            <span
-                class="inline-block bg-white bg-opacity-20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full mb-3 uppercase tracking-widest border border-white border-opacity-30">
-                DTPR (Penghitung Rasio)
-            </span>
-            {% endif %}
             <p class="text-gold-300 font-semibold mb-4 text-center">{{ dosen.pendidikan }}</p>
 
             <div class="w-full space-y-3 mt-4 text-sm">

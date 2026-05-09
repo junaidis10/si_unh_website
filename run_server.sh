@@ -14,6 +14,7 @@ if [ -f venv/bin/activate ]; then
 fi
 
 echo "Checking for database migrations..."
+python3 manage.py migrate core 0019 --fake 2>/dev/null
 python3 manage.py migrate
 
 echo "Starting Django development server..."

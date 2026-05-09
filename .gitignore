@@ -40,3 +40,10 @@ media/**/.DS_Store
 
 # Scratch/Temporary
 scratch/
+
+# Debug scripts (local dev only)
+debug_db*.py
+test_db*.py
+
+# Non-source files
+*.pdf

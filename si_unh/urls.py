@@ -22,6 +22,7 @@ urlpatterns = [
     path('survey/pengguna/', views.submit_survey_lulusan, name='submit_survey_lulusan'),
     path('survey/kurikulum/', views.submit_survey_kurikulum, name='submit_survey_kurikulum'),
     path('survey/pengguna/export/', views.export_survey_excel, name='export_survey_excel'),
+    path('survey/pengguna/import/', views.SurveyImportView.as_view(), name='survey_import'),
     path('survey/pengguna/stats/', views.survey_stats_view, name='survey_stats_view'),
     path('survey/kurikulum/stats/', views.kurikulum_stats_view, name='kurikulum_stats_view'),
     path('survey/vmts/export/', views.export_vmts_excel, name='export_vmts_excel'),
@@ -37,6 +38,10 @@ urlpatterns = [
     # Search
     path('search/', views.search, name='search'),
     
+    # Repository Berkas
+    path('repository-berkas/', views.repository_berkas, name='repository_berkas'),
+    path('repository-berkas/download/<int:berkas_id>/', views.download_berkas, name='download_berkas'),
+    
     # Authentication
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
@@ -47,8 +52,19 @@ urlpatterns = [
     path('admin-tools/import-penelitian/', views.import_penelitian, name='import_penelitian'),
     path('admin-tools/tarik-sinta/<int:dosen_id>/', views.tarik_sinta, name='tarik_sinta'),
     
-    # Layanan Akademik
-    path('layanan-akademik/', include('layanan_akademik.urls')),
+    # Layanan Akademik (dikonsolidasi ke core)
+    path('layanan-akademik/', views.LADashboardView.as_view(), name='la_dashboard'),
+    path('layanan-akademik/mahasiswa/import/', views.MahasiswaImportView.as_view(), name='la_mahasiswa_import'),
+    path('layanan-akademik/kp-magang/', views.KPListView.as_view(), name='la_kp_list'),
+    path('layanan-akademik/kp-magang/pengajuan/', views.KPCreateView.as_view(), name='la_kp_create'),
+    path('layanan-akademik/kp-magang/detail/', views.KPDetailView.as_view(), name='la_kp_detail'),
+    path('layanan-akademik/tugas-akhir/', views.TAListView.as_view(), name='la_ta_list'),
+    path('layanan-akademik/tugas-akhir/pendaftaran/', views.TACreateView.as_view(), name='la_ta_create'),
+    path('layanan-akademik/tugas-akhir/detail/', views.TADetailView.as_view(), name='la_ta_detail'),
+    path('layanan-akademik/tugas-akhir/<int:pk>/edit/', views.TAUpdateView.as_view(), name='la_ta_update'),
+    path('layanan-akademik/tugas-akhir/pendaftaran-sidang/', views.SidangCreateView.as_view(), name='la_sidang_create'),
+    path('layanan-akademik/judul-proposal/', views.JudulProposalCreateView.as_view(), name='la_judul_proposal_create'),
+    path('layanan-akademik/jadwal/', views.LAJadwalView.as_view(), name='la_jadwal'),
 ]
 
 if settings.DEBUG:

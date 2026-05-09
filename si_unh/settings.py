@@ -25,7 +25,6 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_tailwind',
     'core',
-    'layanan_akademik',
 ]
 
 MIDDLEWARE = [

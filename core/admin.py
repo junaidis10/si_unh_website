@@ -299,3 +299,278 @@ class JadwalPerkuliahanItemAdmin(admin.ModelAdmin):
     list_filter = ['semester', 'is_active', 'batch_label']
     search_fields = ['kode_mk', 'nama_mk', 'dosen', 'jadwal', 'ruangan']
     list_editable = ['is_active', 'jadwal', 'ruangan']
+
+
+@admin.register(KategoriBerkas)
+class KategoriBerkasAdmin(admin.ModelAdmin):
+    list_display = ['nama', 'slug']
+    prepopulated_fields = {'slug': ('nama',)}
+
+
+@admin.register(RepositoryBerkas)
+class RepositoryBerkasAdmin(admin.ModelAdmin):
+    list_display = ['nama_berkas', 'no_berkas', 'kategori', 'tahun', 'created_at']
+    list_filter = ['kategori', 'tahun']
+    search_fields = ['nama_berkas', 'no_berkas', 'perihal']
+
+
+# ============================================================
+# Admin Layanan Akademik (dikonsolidasi dari layanan_akademik app)
+# ============================================================
+
+@admin.register(Semester)
+class SemesterAdmin(admin.ModelAdmin):
+    list_display = ('tahun_akademik', 'jenis', 'is_active')
+    list_filter = ('jenis', 'is_active')
+    search_fields = ('tahun_akademik',)
+
+@admin.register(Staf)
+class StafAdmin(admin.ModelAdmin):
+    list_display = ('nama', 'nip', 'jabatan', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('nama', 'nip')
+
+@admin.register(KetuaSidang)
+class KetuaSidangAdmin(admin.ModelAdmin):
+    list_display = ('nama', 'identitas', 'instansi')
+    search_fields = ('nama', 'identitas', 'instansi')
+
+@admin.register(Mahasiswa)
+class MahasiswaAdmin(admin.ModelAdmin):
+    list_display = ('nim', 'nama', 'prodi', 'angkatan', 'is_active')
+    list_filter = ('angkatan', 'prodi', 'is_active')
+    search_fields = ('nim', 'nama')
+    change_list_template = "admin/layanan_akademik/mahasiswa_changelist.html"
+
+@admin.register(KerjaPraktekMagang)
+class KerjaPraktekMagangAdmin(admin.ModelAdmin):
+    list_display = ('mahasiswa', 'instansi_nama', 'semester', 'status', 'dosen_pembimbing')
+    list_filter = ('status', 'semester')
+    search_fields = ('mahasiswa__nama', 'instansi_nama')
+# ============================================================
+# ALUR: JudulProposal → TugasAkhir → Seminar Proposal → Sidang
+# ============================================================
+
+# Inline Seminar Proposal di dalam TugasAkhir
+class SeminarProposalInline(admin.StackedInline):
+    model = SeminarProposal
+    extra = 0
+    max_num = 1
+    verbose_name = "Penjadwalan Seminar Proposal"
+    verbose_name_plural = "Penjadwalan Seminar Proposal"
+    autocomplete_fields = ['ketua', 'penguji_utama', 'pembimbing_proposal', 'notulis']
+    fieldsets = (
+        ('Jadwal', {
+            'fields': ('tanggal', 'jam', 'ruangan')
+        }),
+        ('Tim Penguji', {
+            'fields': ('ketua', 'penguji_utama', 'pembimbing_proposal', 'notulis')
+        }),
+        ('Hasil Seminar', {
+            'fields': ('hasil', 'catatan', 'laporan_file', 'berita_acara')
+        }),
+    )
+
+# Inline Sidang Skripsi di dalam TugasAkhir
+class SidangSkripsiInline(admin.StackedInline):
+    model = SidangSkripsi
+    extra = 0
+    max_num = 1
+    verbose_name = "Penjadwalan Sidang Skripsi"
+    verbose_name_plural = "Penjadwalan Sidang Skripsi"
+    autocomplete_fields = ['ketua', 'penguji_utama', 'pembimbing_utama', 'pembimbing_pendamping', 'notulis']
+
+
+# --- 1. PENGAJUAN JUDUL PROPOSAL (Titik awal alur) ---
+@admin.register(JudulProposalSkripsi)
+class JudulProposalSkripsiAdmin(admin.ModelAdmin):
+    list_display = ('nim', 'nama_mahasiswa', 'program_studi', 'thn_akademik', 'status', 'judul_disetujui_display', 'created_at')
+    list_filter = ('status', 'program_studi', 'thn_akademik')
+    search_fields = ('nim', 'nama_mahasiswa', 'judul_proposal1', 'judul_proposal2', 'judul_proposal3')
+    readonly_fields = ('created_at',)
+    autocomplete_fields = ['pembimbing_utama', 'pembimbing_pendamping']
+
+    fieldsets = (
+        ('Data Mahasiswa', {
+            'fields': ('nim', 'nama_mahasiswa', 'program_studi', 'thn_akademik', 'created_at')
+        }),
+        ('3 Judul Proposal yang Diajukan', {
+            'fields': ('judul_proposal1', 'judul_proposal2', 'judul_proposal3', 'abstrak')
+        }),
+        ('Keputusan Tim / Kaprodi', {
+            'fields': ('status', 'judul_disetujui', 'pembimbing_utama', 'pembimbing_pendamping', 'catatan_tim'),
+            'description': '⬇️ Pilih salah satu judul, tentukan pembimbing, ubah status. Setelah disetujui, buat Tugas Akhir untuk jadwalkan seminar.',
+        }),
+    )
+
+    def judul_disetujui_display(self, obj):
+        if obj.judul_disetujui:
+            return f"Judul {obj.judul_disetujui}"
+        return "—"
+    judul_disetujui_display.short_description = "Judul Dipilih"
+
+
+# --- 2. TUGAS AKHIR + SEMINAR + SIDANG (All-in-one) ---
+@admin.register(TugasAkhir)
+class TugasAkhirAdmin(admin.ModelAdmin):
+    list_display = ('mahasiswa', 'judul', 'status', 'pembimbing_utama')
+    list_filter = ('status', 'semester_mulai')
+    search_fields = ('mahasiswa__nama', 'mahasiswa__nim', 'judul')
+    autocomplete_fields = ['mahasiswa', 'pembimbing_utama', 'pembimbing_pendamping', 'semester_mulai']
+    inlines = [SeminarProposalInline, SidangSkripsiInline]
+
+    fieldsets = (
+        ('Data Mahasiswa & Judul Skripsi', {
+            'fields': ('mahasiswa', 'judul', 'semester_mulai', 'status')
+        }),
+        ('Pembimbing', {
+            'fields': ('pembimbing_utama', 'pembimbing_pendamping', 'pembimbing_usulan')
+        }),
+        ('Detail', {
+            'fields': ('abstrak', 'rumusan_masalah', 'metode_penelitian'),
+            'classes': ('collapse',),
+        }),
+    )
+
+    def save_formset(self, request, form, formset, change):
+        """Auto-update status TA berdasarkan hasil seminar/sidang"""
+        instances = formset.save()
+        for obj in instances:
+            if isinstance(obj, SeminarProposal):
+                ta = obj.tugas_akhir
+                if obj.hasil in ['lulus', 'revisi']:
+                    if ta.status in ['judul', 'proposal']:
+                        ta.status = 'skripsi'
+                        ta.save()
+                elif obj.hasil == 'pending' and ta.status == 'judul':
+                    ta.status = 'proposal'
+                    ta.save()
+
+# --- 3. SEMINAR PROPOSAL (Standalone — ambil dari Pengajuan Judul) ---
+from django import forms
+from django.contrib.auth.models import User
+
+class SeminarProposalAdminForm(forms.ModelForm):
+    """Form custom: admin pilih mahasiswa dari daftar pengajuan judul proposal"""
+    pengajuan_judul = forms.ModelChoiceField(
+        queryset=JudulProposalSkripsi.objects.all(),
+        label="Mahasiswa (Pengajuan Judul Proposal)",
+        help_text="Pilih mahasiswa yang sudah mengajukan judul proposal",
+        required=True,
+    )
+
+    class Meta:
+        model = SeminarProposal
+        fields = ['pengajuan_judul', 'tanggal', 'jam', 'ruangan',
+                  'ketua', 'penguji_utama', 'pembimbing_proposal', 'notulis',
+                  'hasil', 'catatan', 'laporan_file', 'berita_acara']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Jika editing, cari proposal yang sesuai dengan tugas_akhir
+        if self.instance.pk and self.instance.tugas_akhir_id:
+            try:
+                nim = self.instance.tugas_akhir.mahasiswa.nim
+                jp = JudulProposalSkripsi.objects.filter(nim=nim).first()
+                if jp:
+                    self.initial['pengajuan_judul'] = jp.pk
+            except Exception:
+                pass
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        proposal = self.cleaned_data['pengajuan_judul']
+
+        # 1. Cari atau buat User
+        user, _ = User.objects.get_or_create(
+            username=proposal.nim,
+            defaults={
+                'first_name': proposal.nama_mahasiswa,
+                'is_active': True,
+            }
+        )
+
+        # 2. Cari atau buat Mahasiswa
+        mhs, _ = Mahasiswa.objects.get_or_create(
+            nim=proposal.nim,
+            defaults={
+                'user': user,
+                'nama': proposal.nama_mahasiswa,
+                'prodi': proposal.program_studi,
+                'angkatan': int(proposal.thn_akademik[:4]) if proposal.thn_akademik else 2024,
+            }
+        )
+
+        # 3. Cari atau buat Semester
+        semester = Semester.objects.filter(is_active=True).first()
+        if not semester:
+            semester, _ = Semester.objects.get_or_create(
+                tahun_akademik=proposal.thn_akademik,
+                defaults={'jenis': 'gasal', 'is_active': True}
+            )
+
+        # 4. Cari atau buat TugasAkhir
+        judul_terpilih = proposal.get_judul_terpilih()
+        ta, created = TugasAkhir.objects.get_or_create(
+            mahasiswa=mhs,
+            defaults={
+                'judul': judul_terpilih,
+                'semester_mulai': semester,
+                'status': 'proposal',
+            }
+        )
+        if created and hasattr(proposal, 'pembimbing_utama') and proposal.pembimbing_utama:
+            ta.pembimbing_utama = proposal.pembimbing_utama
+            ta.pembimbing_pendamping = proposal.pembimbing_pendamping
+            ta.save()
+
+        # Update status proposal
+        proposal.status = 'seminar'
+        proposal.save()
+
+        instance.tugas_akhir = ta
+        if commit:
+            instance.save()
+        return instance
+
+
+@admin.register(SeminarProposal)
+class SeminarProposalAdmin(admin.ModelAdmin):
+    form = SeminarProposalAdminForm
+    list_display = ('get_mahasiswa', 'get_nim', 'tanggal', 'jam', 'ruangan', 'hasil')
+    list_filter = ('hasil', 'tanggal')
+    search_fields = ('tugas_akhir__mahasiswa__nama', 'tugas_akhir__mahasiswa__nim')
+    autocomplete_fields = ['ketua', 'penguji_utama', 'pembimbing_proposal', 'notulis']
+
+    fieldsets = (
+        ('Mahasiswa', {
+            'fields': ('pengajuan_judul',),
+            'description': '📋 Pilih mahasiswa dari daftar pengajuan judul proposal.',
+        }),
+        ('Jadwal Seminar', {
+            'fields': ('tanggal', 'jam', 'ruangan')
+        }),
+        ('Tim Penguji', {
+            'fields': ('ketua', 'penguji_utama', 'pembimbing_proposal', 'notulis')
+        }),
+        ('Hasil Seminar', {
+            'fields': ('hasil', 'catatan', 'laporan_file', 'berita_acara'),
+            'classes': ('collapse',),
+        }),
+    )
+
+    def get_mahasiswa(self, obj):
+        return obj.tugas_akhir.mahasiswa.nama
+    get_mahasiswa.short_description = "Nama Mahasiswa"
+
+    def get_nim(self, obj):
+        return obj.tugas_akhir.mahasiswa.nim
+    get_nim.short_description = "NIM"
+
+# --- 4. SIDANG SKRIPSI (Standalone list) ---
+@admin.register(SidangSkripsi)
+class SidangSkripsiAdmin(admin.ModelAdmin):
+    list_display = ('tugas_akhir', 'tanggal', 'jam', 'ruangan', 'hasil')
+    list_filter = ('hasil', 'tanggal')
+    search_fields = ('tugas_akhir__mahasiswa__nama',)
+    autocomplete_fields = ['tugas_akhir', 'ketua', 'penguji_utama', 'pembimbing_utama', 'pembimbing_pendamping', 'notulis']

@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Detail KP/Magang - SI UNH{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 24px;
+    }
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 99px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-success { background: #dcfce7; color: #166534; }
+    .status-info { background: #e0f2fe; color: #075985; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <div class="mb-8">
+            <a href="{% url 'la_dashboard' %}" class="text-sm font-bold text-gray-500 hover:text-primary-600 transition flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard
+            </a>
+        </div>
+
+        <div class="glass-card p-10">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
+                <div class="flex items-center gap-6">
+                    <div class="w-20 h-20 bg-gold-100 text-gold-600 rounded-3xl flex items-center justify-center text-3xl shadow-sm">
+                        <i class="fas fa-industry"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-extrabold text-gray-900 mb-2">{{ kp.instansi_nama }}</h1>
+                        <p class="text-gray-500 font-medium"><i class="fas fa-map-marker-alt mr-1"></i> {{ kp.instansi_alamat }}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="status-badge {% if kp.status == 'pengajuan' %}status-pending{% elif kp.status == 'selesai' %}status-success{% else %}status-info{% endif %} text-sm">
+                        {{ kp.get_status_display }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
+                <div class="space-y-6">
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Periode Pelaksanaan</label>
+                        <div class="flex items-center text-gray-800 font-bold">
+                            <i class="fas fa-calendar-alt text-gold-500 mr-3"></i>
+                            {{ kp.tanggal_mulai }} <span class="mx-2 text-gray-300">|</span> {{ kp.tanggal_selesai }}
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Semester</label>
+                        <div class="text-gray-800 font-bold">
+                            {{ kp.semester.nama|default:"Semester Aktif" }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Dosen Pembimbing KP</label>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold">
+                                {{ kp.pembimbing.nama|slice:":1"|default:"?" }}
+                            </div>
+                            <span class="font-bold text-gray-800">{{ kp.pembimbing.nama|default:"Belum Diplot" }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Laporan Akhir</label>
+                        {% if kp.laporan_file %}
+                        <a href="{{ kp.laporan_file.url }}" target="_blank" class="text-primary-600 hover:text-primary-700 font-bold text-sm flex items-center gap-2">
+                            <i class="fas fa-file-pdf"></i> Lihat Laporan Terunggah
+                        </a>
+                        {% else %}
+                        <span class="text-gray-400 text-sm italic">Laporan belum diunggah</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-gray-100">
+                <h4 class="text-lg font-bold text-gray-900 mb-4">Langkah Selanjutnya</h4>
+                <div class="bg-primary-50 p-6 rounded-2xl border border-primary-100">
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-3 text-sm text-primary-800">
+                            <i class="fas fa-check-circle mt-1"></i>
+                            <span>Pastikan Anda rutin melakukan bimbingan dengan dosen pembimbing KP.</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-primary-800">
+                            <i class="fas fa-check-circle mt-1"></i>
+                            <span>Kumpulkan berkas penilaian dari instansi setelah masa magang berakhir.</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-primary-800">
+                            <i class="fas fa-check-circle mt-1"></i>
+                            <span>Unggah laporan final (PDF) di sistem ini untuk diverifikasi oleh dosen pembimbing.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

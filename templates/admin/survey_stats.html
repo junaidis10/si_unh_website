@@ -94,13 +94,29 @@
  new Chart(ctxComp, {
  type: 'bar',
  data: {
- labels: [{% for label in chart_labels %}"{{ label }}",{% endfor %}],
+ labels: {{ chart_labels|safe }},
  datasets: [{
  label: 'Skor Rata-rata',
- data: [{% for val in chart_values %}{{ val }}, {% endfor %}],
- backgroundColor: 'rgba(79, 70, 229, 0.6)',
- borderColor: 'rgb(79, 70, 229)',
- borderWidth: 1
+ data: {{ chart_values|safe }},
+ backgroundColor: [
+    'rgba(79, 70, 229, 0.7)',  // Indigo
+    'rgba(20, 184, 166, 0.7)',  // Teal
+    'rgba(245, 158, 11, 0.7)',  // Amber
+    'rgba(244, 63, 94, 0.7)',   // Rose
+    'rgba(16, 185, 129, 0.7)',  // Emerald
+    'rgba(14, 165, 233, 0.7)',  // Sky Blue
+    'rgba(139, 92, 246, 0.7)'   // Violet
+ ],
+ borderColor: [
+    'rgb(79, 70, 229)',
+    'rgb(20, 184, 166)',
+    'rgb(245, 158, 11)',
+    'rgb(244, 63, 94)',
+    'rgb(16, 185, 129)',
+    'rgb(14, 165, 233)',
+    'rgb(139, 92, 246)'
+ ],
+ borderWidth: 2
  }]
  },
  options: {
@@ -114,20 +130,27 @@
  }
  });
 
- // WT Pie Chart
- const ctxWt = document.getElementById('wtChart').getContext('2d');
- new Chart(ctxWt, {
- type: 'doughnut',
- data: {
- labels: [{% for item in wt_data %}"{{ item.waktu_tunggu }}",{% endfor %}],
- datasets: [{
- data: [{% for item in wt_data %}{{ item.total }}, {% endfor %}],
- backgroundColor: [
- '#10B981', '#3B82F6', '#F59E0B', '#EF4444'
- ]
- }]
- }
- });
+  // WT Pie Chart
+  const ctxWt = document.getElementById('wtChart').getContext('2d');
+  const wtLabels = [{% for item in wt_data %}"{{ item.waktu_tunggu }}",{% endfor %}];
+  const wtColors = wtLabels.map(label => {
+      if (label.includes('3') && !label.includes('36')) return '#10B981'; // < 3 bulan
+      if (label.includes('18') && (label.includes('6') || label.includes('≤'))) return '#3B82F6'; // 6-18 bulan
+      if (label.includes('18') && !label.includes('6')) return '#F59E0B'; // < 18 bulan
+      if (label.includes('24') || label.includes('36')) return '#F43F5E'; // 24-36 bulan
+      return '#8B5CF6';
+  });
+
+  new Chart(ctxWt, {
+  type: 'doughnut',
+  data: {
+  labels: wtLabels,
+  datasets: [{
+  data: [{% for item in wt_data %}{{ item.total }}, {% endfor %}],
+  backgroundColor: wtColors
+  }]
+  }
+  });
  {% endif %}
 </script>
 {% endblock %}

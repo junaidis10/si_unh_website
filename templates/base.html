@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="id">
 
@@ -153,32 +154,61 @@
             color: #7e22ce !important;
         }
 
-        /* Liquid Glass iOS 26 Design */
+        /* Liquid Glass iOS 26 Design - Enhanced Readability */
         .glass-nav-colored {
-            background: linear-gradient(135deg, rgba(126, 34, 206, 0.65) 0%, rgba(217, 119, 6, 0.65) 100%) !important;
-            backdrop-filter: saturate(200%) blur(25px) !important;
-            -webkit-backdrop-filter: saturate(200%) blur(25px) !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
+            background: linear-gradient(135deg, rgba(88, 28, 135, 0.85) 0%, rgba(146, 64, 14, 0.85) 100%) !important;
+            backdrop-filter: saturate(180%) blur(40px) !important;
+            -webkit-backdrop-filter: saturate(180%) blur(40px) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .glass-nav-colored a, .glass-nav-colored button {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-weight: 600;
+        }
+
+        .glass-nav-colored a:hover {
+            color: #fbbf24 !important; /* Brighter gold for hover */
+        }
+        /* Dropdown glass - Enhanced Readability */
+        .glass-dropdown {
+            background: rgba(255, 255, 255, 0.95) !important; /* Almost solid for readability */
+            backdrop-filter: saturate(180%) blur(20px) !important;
+            -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
+            border: 1px solid rgba(255, 255, 255, 1) !important;
+            border-radius: 1.25rem !important;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.2) !important;
+        }
+
+        .glass-dropdown a {
+            color: #1e293b !important; /* Slate 800 for best readability */
+            font-weight: 500;
+        }
+
+        .glass-dropdown a:hover {
+            background: #f1f5f9 !important;
+            color: #7e22ce !important; /* Primary purple on hover */
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.65) !important;
-            backdrop-filter: saturate(200%) blur(25px) !important;
-            -webkit-backdrop-filter: saturate(200%) blur(25px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.6) !important;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05) !important;
-            border-radius: 1.5rem !important;
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.45) !important;
+            backdrop-filter: saturate(180%) blur(30px) !important;
+            -webkit-backdrop-filter: saturate(180%) blur(30px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.4) !important;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.03) !important;
+            border-radius: 2rem !important; /* Extra rounded for iOS 26 feel */
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .glass-card:hover {
-            background: rgba(255, 255, 255, 0.8) !important;
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.08) !important;
+            background: rgba(255, 255, 255, 0.6) !important;
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 50px 0 rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.8) !important;
         }
 
-        /* Override typical card classes globally to apply glass effect automatically */
+        /* Automatic Glass for typical white cards */
         .bg-white.shadow-sm.rounded-xl,
         .bg-white.shadow-sm.rounded-2xl,
         .bg-white.shadow.rounded-lg,
@@ -190,68 +220,99 @@
         .bg-white.shadow-xl.rounded-3xl,
         .bg-white.shadow-2xl.rounded-2xl,
         .bg-white.shadow-2xl.rounded-3xl {
-            background: rgba(255, 255, 255, 0.65) !important;
-            backdrop-filter: saturate(200%) blur(25px) !important;
-            -webkit-backdrop-filter: saturate(200%) blur(25px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.6) !important;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05) !important;
-            border-radius: 1.5rem !important; /* Smooth iOS 26 rounded corners */
+            background: rgba(255, 255, 255, 0.45) !important;
+            backdrop-filter: saturate(180%) blur(30px) !important;
+            -webkit-backdrop-filter: saturate(180%) blur(30px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.4) !important;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.03) !important;
+            border-radius: 2rem !important;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Dropdown glass */
-        .glass-dropdown {
-            background: rgba(255, 255, 255, 0.75) !important;
-            backdrop-filter: saturate(200%) blur(30px) !important;
-            -webkit-backdrop-filter: saturate(200%) blur(30px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.6) !important;
-            border-radius: 1.25rem !important;
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1) !important;
-        }
-
-        /* Subtle background blob for better glass effect */
-        body::before {
-            content: '';
+        /* Dynamic Floating Blobs */
+        .blob-container {
             position: fixed;
-            top: -20%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.2;
+            border-radius: 50%;
+            animation: move 25s infinite alternate;
+        }
+
+        .blob-1 {
+            width: 500px;
+            height: 500px;
+            background: #7e22ce;
+            top: -10%;
             left: -10%;
-            width: 50%;
-            height: 50%;
-            background: radial-gradient(circle, rgba(126, 34, 206, 0.05) 0%, transparent 70%);
-            z-index: -1;
-            border-radius: 50%;
+            animation-duration: 30s;
         }
-        
-        body::after {
-            content: '';
-            position: fixed;
-            bottom: -20%;
-            right: -10%;
-            width: 50%;
-            height: 50%;
-            background: radial-gradient(circle, rgba(217, 119, 6, 0.05) 0%, transparent 70%);
-            z-index: -1;
-            border-radius: 50%;
+
+        .blob-2 {
+            width: 400px;
+            height: 400px;
+            background: #d97706;
+            bottom: -5%;
+            right: -5%;
+            animation-duration: 25s;
+            animation-delay: -5s;
+        }
+
+        .blob-3 {
+            width: 300px;
+            height: 300px;
+            background: #a855f7;
+            top: 40%;
+            right: 15%;
+            animation-duration: 20s;
+            animation-delay: -10s;
+        }
+
+        @keyframes move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 100px) scale(1.2); }
+        }
+
+        /* Smooth Transition for all elements */
+        * {
+            transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
         }
     </style>
 
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="bg-gray-50">
+<body class="bg-gray-50 min-h-screen">
+    <!-- Liquid Blobs Background -->
+    <div class="blob-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
 
     <!-- Navigation -->
     <nav class="glass-nav-colored text-white shadow-lg sticky top-0 z-50 navbar-scroll">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between py-4">
                 <!-- Logo -->
-                <div class="flex items-center space-x-4">
-                    <img src="{{ MEDIA_URL }}logo-unh-smart.png" alt="Logo UNH" class="h-14 w-auto object-contain"
+                <a href="{% url 'home' %}" class="flex items-center space-x-4 group">
+                    <img src="{{ MEDIA_URL }}logo-unh-smart.png" alt="Logo UNH" class="h-14 w-auto object-contain transition-transform group-hover:scale-105"
                         onerror="this.style.display='none'">
                     <div>
                         <h1 class="text-xl font-bold">Sistem Informasi</h1>
                         <p class="text-xs text-gold-200">Universitas Nurdin Hamzah</p>
                     </div>
-                </div>
+                </a>
 
                 <!-- Desktop Menu -->
                 <div class="hidden lg:flex items-center space-x-6">
@@ -340,7 +401,7 @@
                                     class="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition text-sm">
                                     Informasi Umum
                                 </a>
-                                <a href="{% url 'layanan_akademik:dashboard' %}"
+                                <a href="{% url 'la_dashboard' %}"
                                     class="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition text-sm font-semibold">
                                     Layanan Akademik Mahasiswa
                                 </a>
@@ -348,15 +409,47 @@
                         </div>
                     </div>
 
-                    <a href="{% url 'layanan' %}"
-                        class="hover:text-gold-300 transition {% if 'layanan' in request.path and 'akademik' not in request.path %}text-gold-400 font-semibold{% endif %}">Layanan</a>
+                    <!-- Layanan Dropdown -->
+                    <div class="relative group">
+                        <a href="{% url 'layanan' %}"
+                            class="hover:text-gold-300 transition {% if 'layanan' in request.path and 'akademik' not in request.path %}text-gold-400 font-semibold{% endif %} flex items-center">
+                            Layanan <i
+                                class="fas fa-chevron-down ml-1 text-xs transition-transform group-hover:rotate-180"></i>
+                        </a>
+                        <div
+                            class="absolute left-0 mt-2 w-52 glass-dropdown opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 transform origin-top scale-95 group-hover:scale-100 divide-y divide-gray-100 overflow-hidden">
+                            <div class="py-1">
+                                <a href="{% url 'layanan' %}"
+                                    class="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition text-sm">
+                                    Pusat Layanan
+                                </a>
+                                <a href="{% url 'repository_berkas' %}"
+                                    class="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition text-sm">
+                                    Repository Berkas
+                                </a>
+                                <a href="{% url 'layanan' %}#pusat-karir"
+                                    class="block px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition text-sm">
+                                    Pusat Karir
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                     <a href="{% url 'media_informasi' %}"
                         class="hover:text-gold-300 transition {% if 'media-informasi' in request.path %}text-gold-400 font-semibold{% endif %}">Media
                         & Informasi</a>
 
-                    {% if user.is_staff %}
-                    <a href="{% url 'admin_dashboard' %}"
-                        class="bg-gold-500 hover:bg-gold-600 text-primary-900 px-4 py-2 rounded-lg font-bold transition">Dashboard</a>
+                    {% if user.is_authenticated %}
+                        {% if user.is_staff %}
+                        <a href="{% url 'admin_dashboard' %}"
+                            class="bg-gold-500 hover:bg-gold-600 text-primary-900 px-4 py-2 rounded-lg font-bold transition">Dashboard Admin</a>
+                        {% else %}
+                        <a href="{% url 'la_dashboard' %}"
+                            class="bg-gold-500 hover:bg-gold-600 text-primary-900 px-4 py-2 rounded-lg font-bold transition">Dashboard Mahasiswa</a>
+                        {% endif %}
+                        <a href="{% url 'logout' %}" class="text-white hover:text-red-300 font-bold transition ml-2 flex items-center justify-center w-10 h-10 bg-white/10 rounded-full hover:bg-white/20" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+                    {% else %}
+                        <a href="{% url 'login' %}"
+                            class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-bold transition border border-white/30">Login</a>
                     {% endif %}
                 </div>
 
@@ -422,18 +515,40 @@
                         <div id="mhs-sub"
                             class="hidden pl-4 flex flex-col space-y-1 mt-1 border-l-2 border-gold-400/30">
                             <a href="{% url 'kemahasiswaan' %}" class="hover:text-gold-300 transition py-2 text-sm">Informasi Umum</a>
-                            <a href="{% url 'layanan_akademik:dashboard' %}" class="hover:text-gold-300 transition py-2 text-sm font-semibold">Layanan Akademik Mahasiswa</a>
+                            <a href="{% url 'la_dashboard' %}" class="hover:text-gold-300 transition py-2 text-sm font-semibold">Layanan Akademik Mahasiswa</a>
                         </div>
                     </div>
 
-                    <a href="{% url 'layanan' %}" class="hover:text-gold-300 transition py-2">Layanan</a>
+                    <!-- Mobile Layanan with Toggle -->
+                    <div>
+                        <button onclick="toggleMobileSubmenu('layanan-sub')"
+                            class="w-full flex justify-between items-center hover:text-gold-300 transition py-2">
+                            Layanan <i id="layanan-sub-icon"
+                                class="fas fa-chevron-down text-sm transition-transform"></i>
+                        </button>
+                        <div id="layanan-sub"
+                            class="hidden pl-4 flex flex-col space-y-1 mt-1 border-l-2 border-gold-400/30">
+                            <a href="{% url 'layanan' %}" class="hover:text-gold-300 transition py-2 text-sm">Pusat Layanan</a>
+                            <a href="{% url 'repository_berkas' %}" class="hover:text-gold-300 transition py-2 text-sm">Repository Berkas</a>
+                            <a href="{% url 'layanan' %}#pusat-karir" class="hover:text-gold-300 transition py-2 text-sm">Pusat Karir</a>
+                        </div>
+                    </div>
                     <a href="{% url 'media_informasi' %}" class="hover:text-gold-300 transition py-2">Media &
                         Informasi</a>
 
-                    {% if user.is_staff %}
-                    <a href="{% url 'admin_dashboard' %}"
-                        class="bg-gold-500 text-primary-900 px-4 py-3 rounded-lg font-bold text-center mt-4">Dashboard
-                        Admin</a>
+                    {% if user.is_authenticated %}
+                        {% if user.is_staff %}
+                        <a href="{% url 'admin_dashboard' %}"
+                            class="bg-gold-500 text-primary-900 px-4 py-3 rounded-lg font-bold text-center mt-4">Dashboard Admin</a>
+                        {% else %}
+                        <a href="{% url 'la_dashboard' %}"
+                            class="bg-gold-500 text-primary-900 px-4 py-3 rounded-lg font-bold text-center mt-4">Dashboard Mahasiswa</a>
+                        {% endif %}
+                        <a href="{% url 'logout' %}"
+                            class="bg-red-500/20 text-red-200 px-4 py-3 rounded-lg font-bold text-center mt-2 border border-red-500/30">Logout</a>
+                    {% else %}
+                        <a href="{% url 'login' %}"
+                            class="bg-white/20 text-white px-4 py-3 rounded-lg font-bold text-center mt-4 border border-white/30">Login</a>
                     {% endif %}
                 </div>
             </div>

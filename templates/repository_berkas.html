@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+
+{% block title %}Repository Berkas - SI UNH{% endblock %}
+
+{% block extra_css %}
+<style>
+    .repo-header {
+        background: linear-gradient(135deg, rgba(126, 34, 206, 0.9) 0%, rgba(16, 185, 129, 0.7) 50%, rgba(217, 119, 6, 0.6) 100%);
+        padding: 4rem 1rem;
+        border-radius: 0 0 50px 50px;
+        color: white;
+        text-align: center;
+        margin-bottom: -3rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .glass-search {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 30px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-top: -3rem;
+        position: relative;
+        z-index: 10;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .filter-chip {
+        padding: 0.5rem 1.25rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
+        display: inline-block;
+        margin: 0.25rem;
+    }
+
+    .filter-chip.active {
+        background: linear-gradient(135deg, #7e22ce, #9333ea);
+        color: white;
+        box-shadow: 0 4px 12px rgba(126, 34, 206, 0.3);
+    }
+
+    .filter-chip:not(.active) {
+        background: white;
+        color: #6b7280;
+        border-color: #e5e7eb;
+    }
+
+    .filter-chip:hover:not(.active) {
+        border-color: #7e22ce;
+        color: #7e22ce;
+        transform: translateY(-2px);
+    }
+
+    .repo-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #f3f4f6;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+
+    .repo-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        border-color: #e9d5ff;
+    }
+
+    .icon-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        background: #f5f3ff;
+        color: #7e22ce;
+        font-size: 1.5rem;
+    }
+
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-view {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .btn-download {
+        background: #7e22ce;
+        color: white;
+    }
+
+    .btn-download:hover {
+        background: #6b21a8;
+        box-shadow: 0 4px 12px rgba(126, 34, 206, 0.2);
+    }
+
+    .badge-year {
+        background: #fef3c7;
+        color: #d97706;
+        padding: 0.25rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+    .category-section {
+        margin-bottom: 4rem;
+    }
+
+    .category-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f3f4f6;
+    }
+
+    .category-icon {
+        width: 40px;
+        height: 40px;
+        background: #f5f3ff;
+        color: #7e22ce;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .quick-access-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 24px;
+        border: 1px solid #f3f4f6;
+        transition: all 0.3s;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .quick-access-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(126, 34, 206, 0.15);
+        border-color: #7e22ce;
+        background: #f5f3ff;
+    }
+
+    .folder-tab {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1.5rem;
+        background: #7e22ce;
+        color: white;
+        border-radius: 12px 12px 0 0;
+        font-weight: 700;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .folder-content {
+        background: white;
+        border: 2px solid #f3f4f6;
+        border-top: 4px solid #7e22ce;
+        border-radius: 0 20px 20px 20px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="repo-header">
+    <div class="max-w-7xl mx-auto px-4">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Repository Berkas</h1>
+        <p class="text-lg opacity-90 max-w-2xl mx-auto">
+            Arsip dokumen akademik, peraturan, dan berkas penting Program Studi Sistem Informasi UNH.
+        </p>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 pb-20">
+    <!-- Search & Filter Area -->
+    <div class="glass-search">
+        <form method="GET" action="{% url 'repository_berkas' %}" class="space-y-6">
+            <!-- Hidden Fields to maintain state -->
+            {% if selected_kategori_slug %}
+            <input type="hidden" name="kategori" value="{{ selected_kategori_slug }}">
+            {% endif %}
+            
+            <div class="relative flex gap-3">
+                <div class="relative flex-grow">
+                    <input type="text" name="q" value="{{ q|default:'' }}" 
+                           placeholder="Cari nama berkas, nomor, atau perihal..." 
+                           class="w-full pl-12 pr-4 py-4 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 shadow-inner text-gray-700 bg-white bg-opacity-80">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
+                </div>
+                <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-2xl font-bold shadow-lg transition-all active:scale-95">
+                    Cari
+                </button>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-4">
+                <div class="flex-1">
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1">Kategori</label>
+                    <div class="flex flex-wrap">
+                        <a href="?q={{ q|default:'' }}&tahun={{ selected_tahun|default:'' }}" 
+                           class="filter-chip {% if not selected_kategori_slug %}active{% endif %}">Semua</a>
+                        {% for cat in kategori_list %}
+                        <a href="?kategori={{ cat.slug }}&q={{ q|default:'' }}&tahun={{ selected_tahun|default:'' }}" 
+                           class="filter-chip {% if selected_kategori_slug == cat.slug %}active{% endif %}">{{ cat.nama }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="w-full md:w-48">
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1">Tahun</label>
+                    <select name="tahun" onchange="this.form.submit()" 
+                            class="w-full rounded-xl border-gray-200 focus:ring-purple-500 text-sm">
+                        <option value="">Semua Tahun</option>
+                        {% for t in tahun_list %}
+                        <option value="{{ t }}" {% if selected_tahun == t|stringformat:"s" %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                {% if selected_kategori_slug or q or selected_tahun %}
+                <div class="md:pt-6">
+                    <a href="{% url 'repository_berkas' %}" class="text-sm text-red-500 hover:text-red-700 font-bold flex items-center h-full">
+                        <i class="fas fa-times-circle mr-1"></i> Reset Filter
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Quick Access Section -->
+    <div class="mt-12">
+        <h3 class="text-center text-gray-500 font-bold uppercase tracking-widest text-xs mb-8">Kategori Berkas Utama</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <a href="?kategori=matakuliah" class="quick-access-card">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-3xl mb-4">
+                    <i class="fas fa-book-reader"></i>
+                </div>
+                <div class="text-sm font-extrabold text-gray-800">Mata Kuliah</div>
+                <p class="text-[10px] text-gray-400 mt-1 uppercase">kategory-B-matakuliah</p>
+            </a>
+            <a href="?kategori=skripsi" class="quick-access-card">
+                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-3xl mb-4">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="text-sm font-extrabold text-gray-800">Skripsi / TA</div>
+                <p class="text-[10px] text-gray-400 mt-1 uppercase">kategory-B-Skripsi</p>
+            </a>
+            <a href="?kategori=seminar" class="quick-access-card">
+                <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 text-3xl mb-4">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="text-sm font-extrabold text-gray-800">Seminar</div>
+                <p class="text-[10px] text-gray-400 mt-1 uppercase">kategory-B-Seminar</p>
+            </a>
+            <a href="?kategori=kp" class="quick-access-card">
+                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 text-3xl mb-4">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="text-sm font-extrabold text-gray-800">Kerja Praktek / KP</div>
+                <p class="text-[10px] text-gray-400 mt-1 uppercase">kategory-B-KP</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="mt-16">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold text-gray-800">
+                {% if q %}
+                    Hasil pencarian untuk "{{ q }}"
+                {% elif selected_kategori %}
+                    Daftar Berkas: {{ selected_kategori.nama }}
+                {% else %}
+                    Semua Berkas
+                {% endif %}
+                <span class="ml-2 text-sm font-normal text-gray-500">({{ berkas_list.count }} dokumen)</span>
+            </h2>
+        </div>
+
+        {% if berkas_list %}
+            {% if q or selected_kategori_slug or selected_tahun %}
+                <!-- Flat grid for search/filter results -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {% for berkas in berkas_list %}
+                        {% include "includes/berkas_card.html" %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- Grouped view for general repository -->
+                {% regroup berkas_list by kategori as berkas_grouped %}
+                {% for group in berkas_grouped %}
+                    <div class="category-section">
+                        <div class="folder-tab">
+                            <i class="fas fa-folder-open mr-2"></i>
+                            {{ group.grouper.nama }}
+                        </div>
+                        <div class="folder-content">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {% for berkas in group.list %}
+                                    {% include "includes/berkas_card.html" %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% else %}
+        <div class="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+            <div class="text-6xl text-gray-300 mb-4">
+                <i class="fas fa-folder-open"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Tidak ada berkas ditemukan</h3>
+            <p class="text-gray-500">Coba sesuaikan kata kunci atau filter pencarian Anda.</p>
+            <a href="{% url 'repository_berkas' %}" class="mt-4 inline-block text-purple-600 font-bold hover:underline">Lihat semua berkas</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

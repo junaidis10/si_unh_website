@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Pengajuan Judul Proposal Skripsi - SI UNH{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-4">
+        <div class="max-w-2xl mx-auto">
+            <div class="mb-8 text-center">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Pengajuan Judul Proposal Skripsi</h1>
+                <p class="text-gray-600">Lengkapi formulir di bawah ini. Anda wajib mengajukan <strong>3 judul proposal</strong> skripsi.</p>
+            </div>
+
+            {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                <div class="p-4 rounded-xl border mb-2 {% if message.tags == 'success' %}bg-green-50 text-green-700 border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-600 border-red-200{% else %}bg-blue-50 text-blue-700 border-blue-200{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+
+                    <!-- Info Mahasiswa (read-only) -->
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 mb-6 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">NIM</label>
+                                <div class="font-semibold text-gray-800">{{ mhs.nim }}</div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Nama Lengkap</label>
+                                <div class="font-semibold text-gray-800">{{ mhs.nama }}</div>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Program Studi</label>
+                                <div class="font-semibold text-gray-800">{{ mhs.prodi|default:"Sistem Informasi" }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tahun Akademik -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Tahun Akademik</label>
+                        <input type="text" name="thn_akademik" 
+                               value="{% if semester_aktif %}{{ semester_aktif.tahun_akademik }}{% endif %}" 
+                               class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition outline-none"
+                               placeholder="Contoh: 2025/2026" required>
+                    </div>
+
+                    <!-- Judul Proposal 1 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">
+                            <span class="inline-flex items-center justify-center w-6 h-6 bg-purple-600 text-white rounded-full text-xs font-bold mr-2">1</span>
+                            Judul Proposal Pertama
+                        </label>
+                        <input type="text" name="judul_proposal1"
+                               class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition outline-none"
+                               placeholder="Masukkan judul proposal skripsi pertama..." required>
+                    </div>
+
+                    <!-- Judul Proposal 2 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">
+                            <span class="inline-flex items-center justify-center w-6 h-6 bg-purple-600 text-white rounded-full text-xs font-bold mr-2">2</span>
+                            Judul Proposal Kedua
+                        </label>
+                        <input type="text" name="judul_proposal2"
+                               class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition outline-none"
+                               placeholder="Masukkan judul proposal skripsi kedua..." required>
+                    </div>
+
+                    <!-- Judul Proposal 3 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">
+                            <span class="inline-flex items-center justify-center w-6 h-6 bg-purple-600 text-white rounded-full text-xs font-bold mr-2">3</span>
+                            Judul Proposal Ketiga
+                        </label>
+                        <input type="text" name="judul_proposal3"
+                               class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition outline-none"
+                               placeholder="Masukkan judul proposal skripsi ketiga..." required>
+                    </div>
+
+                    <!-- Abstrak -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Abstrak <span class="text-gray-400 font-normal normal-case">(opsional)</span></label>
+                        <textarea name="abstrak" rows="4"
+                                  class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition outline-none"
+                                  placeholder="Jelaskan secara singkat latar belakang atau gambaran umum dari proposal Anda..."></textarea>
+                    </div>
+
+                    <div class="pt-4 flex items-center justify-between">
+                        <a href="{% url 'la_dashboard' %}" class="text-gray-400 font-bold hover:text-gray-600 transition uppercase tracking-widest text-sm">Batal</a>
+                        <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white px-10 py-4 rounded-full font-bold transition shadow-lg hover:shadow-primary-200">
+                            Simpan Pengajuan
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Info Box -->
+            <div class="mt-8 bg-blue-50 rounded-2xl p-6 border border-blue-100">
+                <div class="flex">
+                    <i class="fas fa-info-circle text-blue-500 mt-1 mr-4"></i>
+                    <p class="text-sm text-blue-700">
+                        <strong>Informasi:</strong> Anda wajib mengajukan 3 judul proposal skripsi. Admin atau Kaprodi akan melakukan verifikasi dan memilih salah satu judul yang disetujui, kemudian memplot Dosen Pembimbing. Anda dapat memantau status pengajuan melalui Dashboard.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Riwayat Pengajuan -->
+            {% if proposals %}
+            <div class="mt-10">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Riwayat Pengajuan Judul Anda</h2>
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50 text-gray-600 uppercase tracking-wider text-xs">
+                                <tr>
+                                    <th class="px-6 py-4 text-left">No</th>
+                                    <th class="px-6 py-4 text-left">Thn Akademik</th>
+                                    <th class="px-6 py-4 text-left">Judul 1</th>
+                                    <th class="px-6 py-4 text-left">Judul 2</th>
+                                    <th class="px-6 py-4 text-left">Judul 3</th>
+                                    <th class="px-6 py-4 text-left">Tanggal</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                {% for p in proposals %}
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="px-6 py-4 text-gray-700">{{ forloop.counter }}</td>
+                                    <td class="px-6 py-4 text-gray-700">{{ p.thn_akademik }}</td>
+                                    <td class="px-6 py-4 text-gray-800 font-medium">{{ p.judul_proposal1 }}</td>
+                                    <td class="px-6 py-4 text-gray-800 font-medium">{{ p.judul_proposal2 }}</td>
+                                    <td class="px-6 py-4 text-gray-800 font-medium">{{ p.judul_proposal3 }}</td>
+                                    <td class="px-6 py-4 text-gray-500">{{ p.created_at|date:"d M Y, H:i" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

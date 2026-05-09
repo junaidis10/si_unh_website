@@ -1,0 +1,41 @@
+<div class="repo-card p-6 flex flex-col h-full">
+    <div class="flex justify-between items-start mb-2">
+        <div class="icon-box">
+            {% if berkas.file.name|lower|slice:"-4:" == ".pdf" %}
+            <i class="fas fa-file-pdf"></i>
+            {% elif berkas.file.name|lower|slice:"-5:" == ".docx" or berkas.file.name|lower|slice:"-4:" == ".doc" %}
+            <i class="fas fa-file-word"></i>
+            {% elif berkas.file.name|lower|slice:"-5:" == ".xlsx" or berkas.file.name|lower|slice:"-4:" == ".xls" %}
+            <i class="fas fa-file-excel"></i>
+            {% else %}
+            <i class="fas fa-file-alt"></i>
+            {% endif %}
+        </div>
+        <span class="badge-year">{{ berkas.tahun }}</span>
+    </div>
+
+    <div class="mb-2">
+        <span class="text-xs font-bold text-purple-600 uppercase tracking-wider">{{ berkas.kategori.nama }}</span>
+    </div>
+    
+    <h3 class="text-lg font-bold text-gray-900 mb-2 leading-snug line-clamp-2" title="{{ berkas.nama_berkas }}">
+        {{ berkas.nama_berkas }}
+    </h3>
+    
+    {% if berkas.no_berkas %}
+    <p class="text-xs text-gray-500 mb-3">No: {{ berkas.no_berkas }}</p>
+    {% endif %}
+
+    <div class="text-sm text-gray-600 mb-6 flex-grow line-clamp-3">
+        {{ berkas.perihal|truncatewords:20 }}
+    </div>
+
+    <div class="mt-auto pt-4 border-t border-gray-50 flex gap-3">
+        <a href="{% url 'download_berkas' berkas.id %}?view=inline" target="_blank" class="btn-action btn-view flex-1 justify-center">
+            <i class="fas fa-eye"></i> Lihat
+        </a>
+        <a href="{% url 'download_berkas' berkas.id %}" class="btn-action btn-download flex-1 justify-center">
+            <i class="fas fa-download"></i> Unduh
+        </a>
+    </div>
+</div>

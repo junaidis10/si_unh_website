@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}Detail Tugas Akhir - SI UNH{% endblock %}
+
+{% block extra_css %}
+<style>
+    .step-item {
+        position: relative;
+        padding-left: 3rem;
+        padding-bottom: 2rem;
+    }
+    .step-item::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e5e7eb;
+    }
+    .step-item:last-child::before {
+        display: none;
+    }
+    .step-icon {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        border: 4px solid white;
+    }
+    .step-active .step-icon { background: #7e22ce; color: white; box-shadow: 0 0 0 4px rgba(126, 34, 206, 0.2); }
+    .step-completed .step-icon { background: #10b981; color: white; }
+    .step-pending .step-icon { background: #f3f4f6; color: #9ca3af; }
+    
+    .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 24px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-4 max-w-5xl">
+        <div class="mb-8 flex items-center justify-between">
+            <a href="{% url 'la_dashboard' %}" class="text-sm font-bold text-gray-500 hover:text-purple-600 transition flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard
+            </a>
+            <div class="flex items-center gap-4">
+                {% if ta.status == 'judul' %}
+                <a href="{% url 'la_ta_update' ta.id %}" class="px-4 py-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-full text-xs font-bold uppercase tracking-wider transition">
+                    <i class="fas fa-edit mr-1"></i> Perbaiki Pengajuan
+                </a>
+                {% endif %}
+                <span class="px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-xs font-bold uppercase tracking-wider">
+                    Status: {{ ta.get_status_display }}
+                </span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Timeline Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="glass-card p-8 sticky top-8">
+                    <h3 class="text-xl font-bold text-gray-900 mb-8">Alur Tugas Akhir</h3>
+                    
+                    <div class="space-y-0">
+                        <!-- Step 1 -->
+                        <div class="step-item {% if ta.status == 'judul' %}step-active{% else %}step-completed{% endif %}">
+                            <div class="step-icon">
+                                <i class="fas {% if ta.status == 'judul' %}fa-pen-nib{% else %}fa-check{% endif %} text-xs"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-800">Pengajuan Judul</h4>
+                            <p class="text-xs text-gray-500 mt-1">Pendaftaran judul dan verifikasi oleh Prodi.</p>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="step-item {% if ta.status == 'proposal' %}step-active{% elif ta.status in 'skripsi,lulus' %}step-completed{% else %}step-pending{% endif %}">
+                            <div class="step-icon">
+                                <i class="fas {% if ta.status == 'proposal' %}fa-microphone{% elif ta.status in 'skripsi,lulus' %}fa-check{% else %}fa-lock{% endif %} text-xs"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-800">Seminar Proposal</h4>
+                            <p class="text-xs text-gray-500 mt-1">Penyajian rencana penelitian di depan penguji.</p>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="step-item {% if ta.status == 'skripsi' %}step-active{% elif ta.status == 'lulus' %}step-completed{% else %}step-pending{% endif %}">
+                            <div class="step-icon">
+                                <i class="fas {% if ta.status == 'skripsi' %}fa-graduation-cap{% elif ta.status == 'lulus' %}fa-check{% else %}fa-lock{% endif %} text-xs"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-800">Sidang Skripsi</h4>
+                            <p class="text-xs text-gray-500 mt-1">Ujian akhir pertanggungjawaban skripsi.</p>
+                        </div>
+
+                        <!-- Step 4 -->
+                        <div class="step-item {% if ta.status == 'lulus' %}step-active{% else %}step-pending{% endif %}">
+                            <div class="step-icon">
+                                <i class="fas fa-flag-checkered text-xs"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-800">Selesai / Wisuda</h4>
+                            <p class="text-xs text-gray-500 mt-1">Penyerahan revisi final dan yudisium.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Info Card -->
+                <div class="glass-card p-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Informasi Tugas Akhir</h2>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Judul Penelitian</label>
+                            <p class="text-lg font-bold text-gray-800 leading-relaxed italic">"{{ ta.judul }}"</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Pembimbing Utama</label>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold">
+                                        {{ ta.pembimbing_utama.nama|slice:":1"|default:"?" }}
+                                    </div>
+                                    <span class="font-semibold text-gray-700">{{ ta.pembimbing_utama.nama|default:"Belum Diplot" }}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Pembimbing Pendamping</label>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
+                                        {{ ta.pembimbing_pendamping.nama|slice:":1"|default:"?" }}
+                                    </div>
+                                    <span class="font-semibold text-gray-700">{{ ta.pembimbing_pendamping.nama|default:"Belum Diplot" }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Abstrak / Rencana Penelitian</label>
+                            <div class="text-sm text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-xl">
+                                {{ ta.abstrak|safe|default:"Tidak ada deskripsi." }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schedule Card -->
+                <div class="glass-card p-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Jadwal & Hasil</h2>
+                    
+                    <div class="space-y-6">
+                        <!-- Seminar Section -->
+                        <div class="p-6 rounded-2xl border {% if seminar %}border-purple-200 bg-purple-50/50{% else %}border-gray-200 bg-gray-50/30 opacity-60{% endif %}">
+                            <div class="flex justify-between items-start mb-4">
+                                <h4 class="font-bold text-gray-800">Seminar Proposal</h4>
+                                {% if seminar %}
+                                <span class="status-badge {% if seminar.hasil == 'lulus' %}status-success{% else %}status-pending{% endif %}">
+                                    {{ seminar.get_hasil_display }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            {% if seminar %}
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div class="text-gray-600"><i class="fas fa-calendar mr-2 text-purple-400"></i> {{ seminar.tanggal }}</div>
+                                <div class="text-gray-600 text-right"><i class="fas fa-clock mr-2 text-purple-400"></i> {{ seminar.jam }}</div>
+                                <div class="text-gray-600"><i class="fas fa-map-marker-alt mr-2 text-purple-400"></i> {{ seminar.ruangan }}</div>
+                            </div>
+                            {% else %}
+                            <p class="text-sm text-gray-400 italic">Belum ada jadwal seminar yang ditentukan.</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Sidang Section -->
+                        <div class="p-6 rounded-2xl border {% if sidang %}border-gold-200 bg-gold-50/50{% else %}border-gray-200 bg-gray-50/30 opacity-60{% endif %}">
+                            <div class="flex justify-between items-start mb-4">
+                                <h4 class="font-bold text-gray-800">Sidang Skripsi</h4>
+                                {% if sidang %}
+                                <span class="status-badge {% if sidang.hasil == 'lulus' %}status-success{% else %}status-pending{% endif %}">
+                                    {{ sidang.get_hasil_display }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            {% if sidang %}
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div class="text-gray-600"><i class="fas fa-calendar mr-2 text-gold-400"></i> {{ sidang.tanggal }}</div>
+                                <div class="text-gray-600 text-right"><i class="fas fa-clock mr-2 text-gold-400"></i> {{ sidang.jam }}</div>
+                                <div class="text-gray-600"><i class="fas fa-map-marker-alt mr-2 text-gold-400"></i> {{ sidang.ruangan }}</div>
+                            </div>
+                            {% else %}
+                            <p class="text-sm text-gray-400 italic">Belum ada jadwal sidang skripsi.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

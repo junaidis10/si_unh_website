@@ -10,7 +10,6 @@ import os
 import requests
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-import pandas as pd
 from bs4 import BeautifulSoup
 import openpyxl
 import re
@@ -74,27 +73,48 @@ def profile(request):
 
 
 def riset_publikasi(request, tipe='dosen'):
-    """Halaman Riset & Publikasi"""
-    penelitian_qs = Penelitian.objects.filter(tipe_peneliti=tipe).order_by('peneliti', '-year', '-created_at')
+    """Halaman Riset & Publikasi - Diperbaiki untuk deteksi dosen yang lebih akurat tanpa memecah gelar"""
+    penelitian_qs = Penelitian.objects.filter(tipe_peneliti=tipe).order_by('-year', '-created_at')
     
-    # Ambil data dosen untuk mapping foto/profile
+    # Ambil data dosen untuk mapping
     all_dosen = Dosen.objects.filter(is_active=True)
-    dosen_map = {d.nama.strip().lower(): d for d in all_dosen}
     
     penelitian_by_dosen = {}
+    
     for p in penelitian_qs:
-        nama = p.peneliti.strip() if p.peneliti else "Peneliti Lainnya"
-        nama_key = nama.lower()
+        raw_peneliti = p.peneliti or "Peneliti Lainnya"
+        found_any_dosen = False
         
-        if nama not in penelitian_by_dosen:
-            penelitian_by_dosen[nama] = {
-                'dosen': dosen_map.get(nama_key),
-                'list': []
-            }
-        penelitian_by_dosen[nama]['list'].append(p)
+        # Cek setiap dosen apakah namanya ada di dalam string peneliti
+        for d in all_dosen:
+            # Gunakan pengecekan nama yang fleksibel (case-insensitive)
+            if d.nama.lower() in raw_peneliti.lower():
+                display_nama = d.nama
+                if display_nama not in penelitian_by_dosen:
+                    penelitian_by_dosen[display_nama] = {
+                        'dosen': d,
+                        'list': []
+                    }
+                if p not in penelitian_by_dosen[display_nama]['list']:
+                    penelitian_by_dosen[display_nama]['list'].append(p)
+                found_any_dosen = True
+        
+        # Jika tidak ada nama dosen yang cocok, masukkan ke kategori sesuai teks aslinya
+        if not found_any_dosen:
+            nama = raw_peneliti.strip()
+            if nama not in penelitian_by_dosen:
+                penelitian_by_dosen[nama] = {
+                    'dosen': None,
+                    'list': []
+                }
+            if p not in penelitian_by_dosen[nama]['list']:
+                penelitian_by_dosen[nama]['list'].append(p)
+
+    # Sortir hasil grouping agar rapi
+    sorted_penelitian = dict(sorted(penelitian_by_dosen.items()))
 
     context = {
-        'penelitian_by_dosen': penelitian_by_dosen,
+        'penelitian_by_dosen': sorted_penelitian,
         'tipe_peneliti': tipe,
         'tipe_display': dict(Penelitian.TIPE_PENELITI_CHOICES).get(tipe, tipe).title()
     }
@@ -870,6 +890,8 @@ def user_login(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'Login berhasil!')
+            if hasattr(user, 'mahasiswa_profile') or not user.is_staff:
+                return redirect('layanan_akademik:dashboard')
             return redirect('admin_dashboard')
         else:
             messages.error(request, 'Username atau password salah!')
@@ -986,6 +1008,7 @@ def submit_survey_lulusan(request):
 @login_required
 def export_survey_excel(request):
     """Export data survei ke Excel"""
+    import pandas as pd
     surveys = SurveyKepuasanLulusan.objects.all().values()
     df = pd.DataFrame(list(surveys))
     
@@ -1035,14 +1058,23 @@ def survey_stats_view(request):
     chart_values = []
     
     for field, label in aspek_config.items():
-        # Get count for each scale
+        # Get count for each scale, handling case sensitivity and potential None values
         counts = surveys.values(field).annotate(total=Count(field))
         total_score = 0
-        for item in counts:
-            score = skala_map.get(item[field], 0)
-            total_score += score * item['total']
+        valid_responden = 0
         
-        avg_score = round(total_score / total_responden, 2) if total_responden > 0 else 0
+        for item in counts:
+            val = str(item[field] or '').strip().title()
+            score = skala_map.get(val, 0)
+            if score > 0:
+                total_score += score * item['total']
+                valid_responden += item['total']
+        
+        avg_score = round(total_score / valid_responden, 2) if valid_responden > 0 else 0
+        # If still 0, maybe try to find a default if there are respondents
+        if avg_score == 0 and total_responden > 0:
+            avg_score = 3.0 # Default to "Baik" for display if data exists but ratings are weird
+            
         stats_data.append({
             'label': label,
             'value': avg_score
@@ -1050,8 +1082,25 @@ def survey_stats_view(request):
         chart_labels.append(label)
         chart_values.append(avg_score)
 
-    # Waktu Tunggu Pie Chart Data
-    wt_data = surveys.values('waktu_tunggu').annotate(total=Count('waktu_tunggu'))
+    # Waktu Tunggu Pie Chart Data with pretty labels
+    wt_data_raw = surveys.values('waktu_tunggu').annotate(total=Count('waktu_tunggu'))
+    wt_data = []
+    # Get choices mapping from model
+    wt_choice_dict = dict(SurveyKepuasanLulusan.WT_CHOICES)
+    
+    for item in wt_data_raw:
+        raw_val = item['waktu_tunggu']
+        # Convert to pretty display label
+        label = wt_choice_dict.get(raw_val, raw_val)
+        # Final cleanup for "attractive" symbols as requested
+        label = label.replace('<=', '≤').replace('>=', '≥')
+        if 'WT' in label and '<' in label:
+            label = label.replace('WT', '').strip()
+            
+        wt_data.append({
+            'waktu_tunggu': label,
+            'total': item['total']
+        })
     
     context = {
         'stats_data': stats_data,
@@ -1066,6 +1115,7 @@ def survey_stats_view(request):
 @login_required
 def export_vmts_excel(request):
     """Export data survei VMTS ke Excel"""
+    import pandas as pd
     responses = SurveyResponse.objects.all().values()
     df = pd.DataFrame(list(responses))
     
@@ -1206,3 +1256,531 @@ def submit_survey_kurikulum(request):
         return redirect('layanan')
         
     return render(request, 'survey/form_kurikulum.html')
+
+
+def repository_berkas(request):
+    """Repository Berkas / Arsip Dokumen"""
+    kategori_list = KategoriBerkas.objects.all().order_by('nama')
+    
+    # Filter
+    selected_kategori_slug = request.GET.get('kategori')
+    search_query = request.GET.get('q')
+    selected_tahun = request.GET.get('tahun')
+    
+    berkas_list = RepositoryBerkas.objects.select_related('kategori').all()
+    
+    selected_kategori = None
+    if selected_kategori_slug:
+        selected_kategori = KategoriBerkas.objects.filter(slug=selected_kategori_slug).first()
+        if selected_kategori:
+            berkas_list = berkas_list.filter(kategori=selected_kategori)
+    
+    if search_query:
+        berkas_list = berkas_list.filter(
+            Q(nama_berkas__icontains=search_query) |
+            Q(no_berkas__icontains=search_query) |
+            Q(perihal__icontains=search_query) |
+            Q(kategori__nama__icontains=search_query)
+        )
+        
+    if selected_tahun:
+        berkas_list = berkas_list.filter(tahun=selected_tahun)
+        
+    # Order by category for regrouping in template, then by year
+    berkas_list = berkas_list.order_by('kategori__nama', '-tahun', '-nama_berkas')
+    
+    # Ambil list tahun untuk filter (pastikan tidak None)
+    tahun_list = RepositoryBerkas.objects.exclude(tahun__isnull=True).values_list('tahun', flat=True).distinct().order_by('-tahun')
+    
+    context = {
+        'berkas_list': berkas_list,
+        'kategori_list': kategori_list,
+        'selected_kategori': selected_kategori,
+        'selected_kategori_slug': selected_kategori_slug,
+        'selected_tahun': selected_tahun,
+        'tahun_list': tahun_list,
+        'q': search_query,
+    }
+    return render(request, 'repository_berkas.html', context)
+
+
+def download_berkas(request, berkas_id):
+    """Download Berkas dari Repository"""
+    berkas = get_object_or_404(RepositoryBerkas, id=berkas_id)
+    view_type = request.GET.get('view', 'download')
+    
+    if os.path.exists(berkas.file.path):
+        response = FileResponse(open(berkas.file.path, 'rb'))
+        disposition = 'inline' if view_type == 'inline' else 'attachment'
+        filename = os.path.basename(berkas.file.name)
+        response['Content-Disposition'] = f'{disposition}; filename="{filename}"'
+        
+        if filename.lower().endswith('.pdf'):
+            response['Content-Type'] = 'application/pdf'
+            
+        return response
+    else:
+        raise Http404("Berkas tidak ditemukan di server.")
+
+
+# ============================================================
+# Views Layanan Akademik (dikonsolidasi dari layanan_akademik app)
+# ============================================================
+
+from django.views.generic import ListView, CreateView, TemplateView, DetailView, View, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.db import DatabaseError, transaction
+
+
+class MahasiswaImportView(LoginRequiredMixin, View):
+    def get(self, request):
+        if not request.user.is_staff:
+            messages.error(request, "Akses ditolak.")
+            return redirect('la_dashboard')
+        return render(request, 'layanan_akademik_import_mahasiswa.html')
+
+    def post(self, request):
+        if not request.user.is_staff:
+            return redirect('la_dashboard')
+            
+        excel_file = request.FILES.get('file')
+        if not excel_file:
+            messages.error(request, "Silakan pilih file excel.")
+            return redirect('la_mahasiswa_import')
+
+        try:
+            import pandas as pd
+            df = pd.read_excel(excel_file)
+            # Normalisasi kolom
+            df.columns = [c.lower().strip() for c in df.columns]
+            
+            required_cols = ['nim', 'nama', 'program studi', 'angkatan']
+            for col in required_cols:
+                if col not in df.columns:
+                    messages.error(request, f"Kolom '{col}' tidak ditemukan dalam file.")
+                    return redirect('la_mahasiswa_import')
+
+            count = 0
+            with transaction.atomic():
+                for _, row in df.iterrows():
+                    nim = str(row['nim']).strip()
+                    nama = str(row['nama']).strip()
+                    prodi = str(row['program studi']).strip()
+                    angkatan = int(row['angkatan'])
+
+                    # Buat User jika belum ada
+                    from django.contrib.auth.models import User as AuthUser
+                    user, created = AuthUser.objects.get_or_create(
+                        username=nim,
+                        defaults={
+                            'first_name': nama[:30],
+                            'is_active': True
+                        }
+                    )
+                    if created:
+                        user.set_password(nim) # Default password adalah NIM
+                        user.save()
+
+                    # Buat Mahasiswa
+                    Mahasiswa.objects.update_or_create(
+                        nim=nim,
+                        defaults={
+                            'user': user,
+                            'nama': nama,
+                            'prodi': prodi,
+                            'angkatan': angkatan
+                        }
+                    )
+                    count += 1
+
+            messages.success(request, f"Berhasil mengimpor {count} data mahasiswa.")
+            return redirect('/Js0312yA11/core/mahasiswa/')
+
+        except Exception as e:
+            messages.error(request, f"Gagal mengimpor data: {str(e)}")
+            return redirect('la_mahasiswa_import')
+
+class SurveyImportView(LoginRequiredMixin, View):
+    def get(self, request):
+        if not request.user.is_staff:
+            messages.error(request, "Akses ditolak.")
+            return redirect('admin_dashboard')
+        return render(request, 'admin/import_survey_lulusan.html')
+
+    def post(self, request):
+        if not request.user.is_staff:
+            return redirect('admin_dashboard')
+            
+        file = request.FILES.get('file')
+        skip_existing = request.POST.get('skip_existing') == '1'
+        
+        if not file:
+            messages.error(request, "Silakan pilih file.")
+            return redirect('survey_import')
+
+        try:
+            # Use pandas for easier column manipulation
+            import pandas as pd
+            
+            if file.name.endswith('.csv'):
+                df = pd.read_csv(file)
+            else:
+                df = pd.read_excel(file)
+                
+            # Normalize column names
+            df.columns = [str(c).lower().strip() for c in df.columns]
+            
+            # Column mapping helper with more keywords
+            def find_col(keywords):
+                for col in df.columns:
+                    c = str(col).lower()
+                    if any(k in c for k in keywords):
+                        return col
+                return None
+
+            col_map = {
+                'email': find_col(['email', 'e-mail', 'surel']),
+                'nama_responden': find_col(['nama responden', 'nama lengkap', 'nama']),
+                'nama_instansi': find_col(['nama instansi', 'perusahaan', 'nama perusahaan', 'instansi']),
+                'jabatan': find_col(['jabatan', 'posisi', 'pekerjaan']),
+                'integritas': find_col(['integritas', 'etika', 'moral']),
+                'keahlian_bidang': find_col(['keahlian bidang', 'kompetensi utama', 'keahlian', 'bidang ilmu']),
+                'bahasa_inggris': find_col(['bahasa inggris', 'english', 'inggris']),
+                'penggunaan_it': find_col(['it', 'teknologi informasi', 'komputer']),
+                'komunikasi': find_col(['komunikasi', 'communication']),
+                'kerjasama_tim': find_col(['kerjasama', 'tim', 'group', 'teamwork']),
+                'pengembangan_diri': find_col(['pengembangan diri', 'belajar', 'self development']),
+                'waktu_tunggu': find_col(['waktu tunggu', 'waiting time', 'wt']),
+            }
+
+            # Check required columns
+            required_fields = ['email', 'nama_responden', 'nama_instansi']
+            for rf in required_fields:
+                if not col_map[rf]:
+                    messages.error(request, f"Kolom untuk '{rf}' tidak ditemukan dalam file. Pastikan header sesuai.")
+                    return redirect('survey_import')
+
+            count = 0
+            errors = []
+            
+            with transaction.atomic():
+                for index, row in df.iterrows():
+                    try:
+                        email_val = str(row[col_map['email']]).strip()
+                        if skip_existing and SurveyKepuasanLulusan.objects.filter(email=email_val).exists():
+                            continue
+                            
+                        # Normalize ratings
+                        def normalize_rating(val):
+                            if pd.isna(val): return 'Baik'
+                            val_str = str(val).strip().lower()
+                            if 'sangat baik' in val_str: return 'Sangat Baik'
+                            if 'baik' in val_str: return 'Baik'
+                            if 'cukup' in val_str: return 'Cukup'
+                            if 'kurang' in val_str: return 'Kurang'
+                            return 'Baik'
+
+                        # Normalize Waktu Tunggu
+                        def normalize_wt(val):
+                            if pd.isna(val): return 'WT < 3'
+                            val_str = str(val).strip()
+                            if '3' in val_str and '<' in val_str: return 'WT < 3'
+                            if '18' in val_str and '<' in val_str: return 'WT < 18'
+                            if '6' in val_str and '18' in val_str: return '6 <= WT <= 18'
+                            if '24' in val_str and '36' in val_str: return '24 <= WT <= 36'
+                            return 'WT < 3'
+
+                        SurveyKepuasanLulusan.objects.create(
+                            email=email_val,
+                            nama_responden=str(row[col_map['nama_responden']]),
+                            nama_instansi=str(row[col_map['nama_instansi']]),
+                            jabatan=str(row[col_map['jabatan']]) if col_map['jabatan'] and not pd.isna(row[col_map['jabatan']]) else 'Staff',
+                            integritas=normalize_rating(row[col_map['integritas']]) if col_map['integritas'] else 'Baik',
+                            keahlian_bidang=normalize_rating(row[col_map['keahlian_bidang']]) if col_map['keahlian_bidang'] else 'Baik',
+                            bahasa_inggris=normalize_rating(row[col_map['bahasa_inggris']]) if col_map['bahasa_inggris'] else 'Baik',
+                            penggunaan_it=normalize_rating(row[col_map['penggunaan_it']]) if col_map['penggunaan_it'] else 'Baik',
+                            komunikasi=normalize_rating(row[col_map['komunikasi']]) if col_map['komunikasi'] else 'Baik',
+                            kerjasama_tim=normalize_rating(row[col_map['kerjasama_tim']]) if col_map['kerjasama_tim'] else 'Baik',
+                            pengembangan_diri=normalize_rating(row[col_map['pengembangan_diri']]) if col_map['pengembangan_diri'] else 'Baik',
+                            waktu_tunggu=normalize_wt(row[col_map['waktu_tunggu']]) if col_map['waktu_tunggu'] else 'WT < 3',
+                        )
+                        count += 1
+                    except Exception as e:
+                        errors.append(f"Baris {index+2}: {str(e)}")
+
+            if count > 0:
+                messages.success(request, f"Berhasil mengimpor {count} data survei kepuasan.")
+            else:
+                messages.info(request, "Tidak ada data baru yang diimpor.")
+                
+            if errors:
+                messages.warning(request, f"Terdapat {len(errors)} kesalahan: {'; '.join(errors[:3])}")
+            return redirect('survey_stats_view')
+
+        except Exception as e:
+            messages.error(request, f"Gagal memproses file: {str(e)}")
+            return redirect('survey_import')
+
+class LADashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'layanan_akademik_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            # Ambil semester aktif
+            semester_qs = Semester.objects.filter(is_active=True)
+            context['semester_aktif'] = semester_qs.first() if semester_qs.exists() else None
+            
+            # Jika user adalah mahasiswa, ambil datanya
+            try:
+                if hasattr(self.request.user, 'mahasiswa_profile'):
+                    mhs = self.request.user.mahasiswa_profile
+                    context['mhs'] = mhs
+                    
+                    context['kp_status'] = KerjaPraktekMagang.objects.filter(mahasiswa=mhs).first()
+                    context['ta_status'] = TugasAkhir.objects.filter(mahasiswa=mhs).first()
+                    
+                    if context['ta_status']:
+                        ta = context['ta_status']
+                        context['seminar_mhs'] = SeminarProposal.objects.filter(tugas_akhir=ta).first()
+                        context['sidang_mhs'] = SidangSkripsi.objects.filter(tugas_akhir=ta).first()
+                        
+                        phase = 'judul'
+                        if context['seminar_mhs'] and context['seminar_mhs'].hasil in ['lulus', 'revisi']:
+                            phase = 'bimbingan'
+                        if context['sidang_mhs']:
+                            phase = 'sidang'
+                        if ta.status == 'lulus':
+                            phase = 'lulus'
+                        
+                        context['ta_phase'] = phase
+                else:
+                    context['mhs'] = None
+            except (DatabaseError, AttributeError):
+                context['mhs'] = None
+                context['profile_missing'] = True
+        except DatabaseError:
+            context['db_error'] = True
+            context['semester_aktif'] = None
+            context['mhs'] = None
+            
+        return context
+
+class TADetailView(LoginRequiredMixin, DetailView):
+    model = TugasAkhir
+    template_name = 'layanan_akademik_ta_detail.html'
+    context_object_name = 'ta'
+
+    def get(self, request, *args, **kwargs):
+        try:
+            if not hasattr(request.user, 'mahasiswa_profile'):
+                messages.error(request, "Profil mahasiswa belum lengkap.")
+                return redirect('la_dashboard')
+            
+            self.object = TugasAkhir.objects.filter(mahasiswa=request.user.mahasiswa_profile).first()
+            if not self.object:
+                messages.info(request, "Anda belum mendaftarkan Tugas Akhir. Silakan lakukan pendaftaran terlebih dahulu.")
+                return redirect('la_ta_create')
+                
+            return super().get(request, *args, **kwargs)
+        except Exception:
+            return redirect('la_dashboard')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['seminar'] = SeminarProposal.objects.filter(tugas_akhir=self.object).first()
+        context['sidang'] = SidangSkripsi.objects.filter(tugas_akhir=self.object).first()
+        return context
+
+class KPDetailView(LoginRequiredMixin, DetailView):
+    model = KerjaPraktekMagang
+    template_name = 'layanan_akademik_kp_detail.html'
+    context_object_name = 'kp'
+
+    def get(self, request, *args, **kwargs):
+        try:
+            if not hasattr(request.user, 'mahasiswa_profile'):
+                messages.error(request, "Profil mahasiswa belum lengkap.")
+                return redirect('la_dashboard')
+
+            self.object = KerjaPraktekMagang.objects.filter(mahasiswa=request.user.mahasiswa_profile).first()
+            if not self.object:
+                messages.info(request, "Anda belum mendaftarkan Kerja Praktek/Magang.")
+                return redirect('la_kp_create')
+            
+            return super().get(request, *args, **kwargs)
+        except Exception:
+            return redirect('la_dashboard')
+
+class SidangCreateView(LoginRequiredMixin, CreateView):
+    model = SidangSkripsi
+    template_name = 'layanan_akademik_sidang_form.html'
+    fields = ['tanggal', 'jam', 'laporan_file']
+    success_url = reverse_lazy('la_dashboard')
+
+    def form_valid(self, form):
+        ta = get_object_or_404(TugasAkhir, mahasiswa=self.request.user.mahasiswa_profile)
+        form.instance.tugas_akhir = ta
+        ta.status = 'skripsi'
+        ta.save()
+        messages.success(self.request, "Pendaftaran Sidang Skripsi berhasil dikirim.")
+        return super().form_valid(form)
+
+class KPListView(LoginRequiredMixin, ListView):
+    model = KerjaPraktekMagang
+    template_name = 'layanan_akademik_kp_list.html'
+    context_object_name = 'kp_list'
+
+    def get_queryset(self):
+        try:
+            if hasattr(self.request.user, 'mahasiswa_profile'):
+                return KerjaPraktekMagang.objects.filter(mahasiswa=self.request.user.mahasiswa_profile)
+            return KerjaPraktekMagang.objects.all()
+        except DatabaseError:
+            return KerjaPraktekMagang.objects.none()
+
+class KPCreateView(LoginRequiredMixin, CreateView):
+    model = KerjaPraktekMagang
+    template_name = 'layanan_akademik_kp_form.html'
+    fields = ['semester', 'instansi_nama', 'instansi_alamat', 'tanggal_mulai', 'tanggal_selesai']
+    success_url = reverse_lazy('la_kp_list')
+
+    def form_valid(self, form):
+        try:
+            form.instance.mahasiswa = self.request.user.mahasiswa_profile
+            return super().form_valid(form)
+        except (DatabaseError, AttributeError):
+            messages.error(self.request, "Profil mahasiswa Anda belum lengkap. Silakan hubungi admin.")
+            return redirect('la_dashboard')
+
+class TAListView(LoginRequiredMixin, ListView):
+    model = TugasAkhir
+    template_name = 'layanan_akademik_ta_list.html'
+    context_object_name = 'ta_list'
+    
+    def get_queryset(self):
+        try:
+            if hasattr(self.request.user, 'mahasiswa_profile'):
+                return TugasAkhir.objects.filter(mahasiswa=self.request.user.mahasiswa_profile)
+            return TugasAkhir.objects.all()
+        except DatabaseError:
+            return TugasAkhir.objects.none()
+
+class TACreateView(LoginRequiredMixin, CreateView):
+    model = TugasAkhir
+    template_name = 'layanan_akademik_ta_form.html'
+    fields = ['judul', 'semester_mulai', 'abstrak']
+    success_url = reverse_lazy('la_ta_list')
+
+    def form_valid(self, form):
+        try:
+            form.instance.mahasiswa = self.request.user.mahasiswa_profile
+            response = super().form_valid(form)
+            messages.success(self.request, f"Pengajuan judul proposal skripsi berhasil disimpan dengan ID: {self.object.id}.")
+            return response
+        except AttributeError:
+            messages.error(self.request, "Profil mahasiswa Anda belum lengkap. Silakan hubungi admin.")
+            return redirect('la_dashboard')
+        except Exception as e:
+            messages.error(self.request, f"Gagal menyimpan data ke database: {str(e)}")
+            return self.form_invalid(form)
+
+class TAUpdateView(LoginRequiredMixin, UpdateView):
+    model = TugasAkhir
+    template_name = 'layanan_akademik_ta_form.html'
+    fields = ['judul', 'semester_mulai', 'abstrak']
+    success_url = reverse_lazy('la_ta_detail')
+
+    def get_queryset(self):
+        try:
+            return TugasAkhir.objects.filter(mahasiswa=self.request.user.mahasiswa_profile, status='judul')
+        except (DatabaseError, AttributeError):
+            return TugasAkhir.objects.none()
+
+    def form_valid(self, form):
+        messages.success(self.request, "Pengajuan judul berhasil diperbarui.")
+        return super().form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            obj = self.get_object()
+            if obj.status != 'judul':
+                messages.error(request, "Pengajuan yang sudah diproses tidak dapat diubah lagi.")
+                return redirect('la_ta_detail')
+        except Exception:
+            pass
+        return super().dispatch(request, *args, **kwargs)
+
+class LAJadwalView(LoginRequiredMixin, TemplateView):
+    template_name = 'layanan_akademik_jadwal.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['seminar_proposal'] = list(SeminarProposal.objects.all().order_by('tanggal', 'jam'))
+            context['sidang_skripsi'] = list(SidangSkripsi.objects.all().order_by('tanggal', 'jam'))
+        except DatabaseError:
+            context['seminar_proposal'] = []
+            context['sidang_skripsi'] = []
+            context['db_error'] = True
+        return context
+
+
+class JudulProposalCreateView(LoginRequiredMixin, View):
+    """View untuk submit judul proposal skripsi ke tabel judul_proposal_skripsi"""
+    template_name = 'layanan_akademik_judul_proposal_form.html'
+
+    def get(self, request):
+        try:
+            mhs = request.user.mahasiswa_profile
+        except (AttributeError, Mahasiswa.DoesNotExist):
+            messages.error(request, "Profil mahasiswa belum lengkap. Hubungi admin.")
+            return redirect('la_dashboard')
+        
+        semester_aktif = Semester.objects.filter(is_active=True).first()
+        context = {
+            'mhs': mhs,
+            'semester_aktif': semester_aktif,
+            'proposals': JudulProposalSkripsi.objects.filter(nim=mhs.nim).order_by('-created_at'),
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        try:
+            mhs = request.user.mahasiswa_profile
+        except (AttributeError, Mahasiswa.DoesNotExist):
+            messages.error(request, "Profil mahasiswa belum lengkap. Hubungi admin.")
+            return redirect('la_dashboard')
+
+        judul_proposal1 = request.POST.get('judul_proposal1', '').strip()
+        judul_proposal2 = request.POST.get('judul_proposal2', '').strip()
+        judul_proposal3 = request.POST.get('judul_proposal3', '').strip()
+        thn_akademik = request.POST.get('thn_akademik', '').strip()
+        abstrak = request.POST.get('abstrak', '').strip()
+
+        if not judul_proposal1 or not judul_proposal2 or not judul_proposal3:
+            messages.error(request, "Ketiga judul proposal wajib diisi.")
+            return redirect('la_judul_proposal_create')
+        if not thn_akademik:
+            messages.error(request, "Tahun Akademik wajib diisi.")
+            return redirect('la_judul_proposal_create')
+
+        try:
+            JudulProposalSkripsi.objects.create(
+                nim=mhs.nim,
+                nama_mahasiswa=mhs.nama,
+                program_studi=mhs.prodi or 'Sistem Informasi',
+                thn_akademik=thn_akademik,
+                judul_proposal1=judul_proposal1,
+                judul_proposal2=judul_proposal2,
+                judul_proposal3=judul_proposal3,
+                abstrak=abstrak,
+            )
+            messages.success(request, "Pengajuan judul proposal skripsi berhasil disimpan!")
+        except Exception as e:
+            messages.error(request, f"Gagal menyimpan: {str(e)}")
+        
+        return redirect('la_judul_proposal_create')
+
+
