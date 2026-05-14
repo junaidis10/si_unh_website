@@ -449,7 +449,7 @@
                         <a href="{% url 'logout' %}" class="text-white hover:text-red-300 font-bold transition ml-2 flex items-center justify-center w-10 h-10 bg-white/10 rounded-full hover:bg-white/20" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
                     {% else %}
                         <a href="{% url 'login' %}"
-                            class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-bold transition border border-white/30">Login</a>
+                            class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-bold transition border border-white/30" title="Login"><i class="fas fa-user-circle text-xl"></i></a>
                     {% endif %}
                 </div>
 
@@ -548,7 +548,7 @@
                             class="bg-red-500/20 text-red-200 px-4 py-3 rounded-lg font-bold text-center mt-2 border border-red-500/30">Logout</a>
                     {% else %}
                         <a href="{% url 'login' %}"
-                            class="bg-white/20 text-white px-4 py-3 rounded-lg font-bold text-center mt-4 border border-white/30">Login</a>
+                            class="bg-white/20 text-white px-4 py-3 rounded-lg font-bold text-center mt-4 border border-white/30" title="Login"><i class="fas fa-user-circle text-xl mr-2"></i>Login</a>
                     {% endif %}
                 </div>
             </div>

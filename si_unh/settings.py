@@ -11,7 +11,8 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-ubah-ini-dengan-secre
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+_allowed_hosts = config('ALLOWED_HOSTS', default='*')
+ALLOWED_HOSTS = [host.strip() for host in _allowed_hosts.split(',') if host.strip()]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -115,6 +116,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Authentication
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
+
+# CSRF Configuration for Production
+# Ambil dari file .env jika ada, jika tidak gunakan default aman ini
+_csrf_origins = config(
+    'CSRF_TRUSTED_ORIGINS', 
+    default='https://si.unh.ac.id,http://si.unh.ac.id,http://localhost:8000,http://127.0.0.1:8000'
+)
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _csrf_origins.split(',') if origin.strip()]
 
 # File Upload Settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB

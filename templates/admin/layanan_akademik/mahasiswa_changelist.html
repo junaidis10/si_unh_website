@@ -1,0 +1,11 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+    {{ block.super }}
+    <li>
+        <a href="{% url 'la_mahasiswa_import' %}" class="addlink" style="background-color: #28a745; color: white;">
+            <i class="fas fa-file-excel"></i> Import Mahasiswa (Excel)
+        </a>
+    </li>
+{% endblock %}

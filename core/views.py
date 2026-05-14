@@ -881,22 +881,77 @@ def admin_dashboard(request):
 
 
 def user_login(request):
-    """Login"""
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        
-        if user is not None:
-            login(request, user)
-            messages.success(request, 'Login berhasil!')
-            if hasattr(user, 'mahasiswa_profile') or not user.is_staff:
-                return redirect('layanan_akademik:dashboard')
+    """Login dengan pemisahan role: Mahasiswa, Dosen, Admin"""
+    if request.user.is_authenticated:
+        # Sudah login, redirect sesuai role
+        if hasattr(request.user, 'mahasiswa_profile'):
+            return redirect('la_dashboard')
+        elif hasattr(request.user, 'dosen_profile'):
+            return redirect('la_dashboard')
+        elif request.user.is_superuser or request.user.is_staff:
             return redirect('admin_dashboard')
+        return redirect('home')
+
+    if request.method == 'POST':
+        input_id = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
+        login_type = request.POST.get('login_type', 'admin')
+
+        if not input_id or not password:
+            messages.error(request, 'Username dan password wajib diisi!')
+            return render(request, 'login.html', {'active_tab': login_type})
+
+        user = None
+
+        if login_type == 'mahasiswa':
+            # Cari Mahasiswa berdasarkan NIM, lalu ambil username yang terhubung
+            try:
+                mhs = Mahasiswa.objects.select_related('user').get(nim=input_id)
+                actual_username = mhs.user.username
+                user = authenticate(request, username=actual_username, password=password)
+                if user is not None:
+                    login(request, user)
+                    messages.success(request, f'Selamat datang, {mhs.nama}!')
+                    return redirect('la_dashboard')
+                else:
+                    messages.error(request, 'Password salah! Pastikan password Anda benar.')
+            except Mahasiswa.DoesNotExist:
+                messages.error(request, f'NIM "{input_id}" tidak terdaftar dalam sistem. Silakan hubungi admin.')
+
+        elif login_type == 'dosen':
+            # Cari Dosen berdasarkan NIDN, lalu ambil username yang terhubung
+            try:
+                dosen = Dosen.objects.select_related('user').get(nidn=input_id)
+                if dosen.user:
+                    actual_username = dosen.user.username
+                    user = authenticate(request, username=actual_username, password=password)
+                    if user is not None:
+                        login(request, user)
+                        messages.success(request, f'Selamat datang, {dosen.nama}!')
+                        return redirect('la_dashboard')
+                    else:
+                        messages.error(request, 'Password salah! Pastikan password Anda benar.')
+                else:
+                    messages.error(request, 'Akun untuk NIDN ini belum dibuat. Silakan hubungi admin.')
+            except Dosen.DoesNotExist:
+                messages.error(request, f'NIDN "{input_id}" tidak terdaftar dalam sistem. Silakan hubungi admin.')
+
         else:
-            messages.error(request, 'Username atau password salah!')
-    
-    return render(request, 'login.html')
+            # Admin / Superuser — langsung authenticate dengan username
+            user = authenticate(request, username=input_id, password=password)
+            if user is not None:
+                if user.is_staff or user.is_superuser:
+                    login(request, user)
+                    messages.success(request, 'Login admin berhasil!')
+                    return redirect('admin_dashboard')
+                else:
+                    messages.error(request, 'Akun ini tidak memiliki hak akses administrator.')
+            else:
+                messages.error(request, 'Username atau password salah!')
+
+        return render(request, 'login.html', {'active_tab': login_type})
+
+    return render(request, 'login.html', {'active_tab': 'mahasiswa'})
 
 
 def user_logout(request):
@@ -1395,7 +1450,8 @@ class MahasiswaImportView(LoginRequiredMixin, View):
                     count += 1
 
             messages.success(request, f"Berhasil mengimpor {count} data mahasiswa.")
-            return redirect('/Js0312yA11/core/mahasiswa/')
+            from django.urls import reverse
+            return redirect(reverse('admin:core_mahasiswa_changelist'))
 
         except Exception as e:
             messages.error(request, f"Gagal mengimpor data: {str(e)}")

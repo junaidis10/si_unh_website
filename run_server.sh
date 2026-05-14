@@ -14,8 +14,13 @@ if [ -f venv/bin/activate ]; then
 fi
 
 echo "Checking for database migrations..."
-python3 manage.py migrate core 0019 --fake 2>/dev/null
 python3 manage.py migrate
 
 echo "Starting Django development server..."
 python3 manage.py runserver
+
+
+# Inject Login dan password(Sudah dijalankan sebelumnya) Pastikan semua dosen lain OK
+# python manage.py fix_dosen_login
+# 3. (Opsional) Perbaiki mahasiswa
+# python manage.py fix_mahasiswa_login --fix

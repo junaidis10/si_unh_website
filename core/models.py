@@ -688,8 +688,27 @@ class Mahasiswa(models.Model):
         verbose_name_plural = "Data Mahasiswa"
         ordering = ['nim']
 
+    def save(self, *args, **kwargs):
+        # Auto-create User if not exists
+        if not self.user_id and self.nim:
+            from django.contrib.auth.models import User as AuthUser
+            user, created = AuthUser.objects.get_or_create(
+                username=self.nim,
+                defaults={
+                    'first_name': self.nama[:30],
+                    'is_active': True,
+                    'is_staff': False,
+                }
+            )
+            if created:
+                user.set_password(self.nim)  # Default password: NIM
+                user.save()
+            self.user = user
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.nim} - {self.nama}"
+
 
 
 class KerjaPraktekMagang(models.Model):
