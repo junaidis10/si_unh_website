@@ -116,6 +116,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Authentication
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 # CSRF Configuration for Production
 # Ambil dari file .env jika ada, jika tidak gunakan default aman ini
